@@ -53,12 +53,24 @@ export default function App({ auth, laravelVersion, phpVersion }) {
                 <header className="header py-6 px-10 flex justify-between items-center bg-white dark:bg-gray-800 shadow-md">
                     <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white pl-4">Sustainable Community Hub</h1>
                     <nav className="flex space-x-6 text-gray-700 dark:text-gray-300">
-                        <a href="#" className="hover:text-[#FF2D20]">Event</a>
-                        <a href="#" className="text-[#FF2D20] font-bold border-b-2 border-[#FF2D20] hover:border-[#e0241c]">Donasi</a>
-                        <a href="#" className="hover:text-[#FF2D20]">Forum Diskusi</a>
-                        <a href="#" className="hover:text-[#FF2D20]">Artikel</a>
-                        <a href="#" className="hover:text-[#FF2D20]">Peta</a>
-                        <a href="#" className="hover:text-[#FF2D20]">Kalender</a>
+                        <a href="#" className="text-[#FF2D20] font-semibold border-b-2 border-[#FF2D20] hover:border-[#e0241c] transition duration-200">
+                            Home
+                        </a>
+                        <a href={route('projects.index')} className="hover:text-[#FF2D20] transition-colors duration-200">
+                            Event
+                        </a>
+                        <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">
+                            Forum Diskusi
+                        </a>
+                        <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">
+                            Artikel
+                        </a>
+                        <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">
+                            Peta
+                        </a>
+                        <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">
+                            Kalender
+                        </a>
                     </nav>
                     <div className="auth-buttons flex space-x-4">
                         {auth.user ? (
