@@ -53,37 +53,50 @@ const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
             <div className="app bg-gray-50 dark:bg-gray-900 text-gray-700 dark:text-gray-300 min-h-screen">
                 
                 {/* Header */}
-                <header className="header py-6 px-10 flex justify-between items-center bg-white dark:bg-gray-800 shadow-md">
-                    <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white pl-4">Sustainable Community Hub</h1>
-                    <nav className="flex space-x-6 text-gray-700 dark:text-gray-300">
-                    <a href={route('home')} className="hover:text-[#FF2D20] transition-colors duration-200">
-                            Home
-                        </a>
-                        <a href={route('projects.index')} className="text-[#FF2D20] font-semibold border-b-2 border-[#FF2D20] hover:border-[#e0241c] transition duration-200">
-                            Event
-                        </a>
-                        <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">
-                            Forum Diskusi
-                        </a>
-                        <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">
-                            Artikel
-                        </a>
-                        <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">
-                            Peta
-                        </a>
-                        <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">
-                            Kalender
-                        </a>
-                    </nav>
-                    <div className="auth-buttons flex space-x-4">
-                        {auth.user ? (
-                            <NavLink href={route('dashboard')}>Dashboard</NavLink>
-                        ) : (
-                            <>
-                                <NavLink href={route('login')}>Log in</NavLink>
-                                <NavLink href={route('register')}>Register</NavLink>
-                            </>
-                        )}
+                <header className="header py-6 px-10 bg-white dark:bg-gray-800 shadow-md">
+                    <div className="container mx-auto flex justify-between items-center">
+                        
+                        {/* Logo / Title */}
+                        <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">
+                            Sustainable Community Hub
+                        </h1>
+
+                        {/* Navigation Links (Centered) */}
+                        <nav className="flex-grow flex justify-center space-x-6 text-gray-700 dark:text-gray-300">
+                            <a href={route('home')} className="hover:text-[#FF2D20] transition-colors duration-200">
+                                Home
+                            </a>
+                            <a href="#" className="text-[#FF2D20] font-semibold border-b-2 border-[#FF2D20] hover:border-[#e0241c] transition duration-200">
+                                Event
+                            </a>
+                            <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">
+                                Donasi
+                            </a>
+                            <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">
+                                Forum Diskusi
+                            </a>
+                            <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">
+                                Artikel
+                            </a>
+                            <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">
+                                Peta
+                            </a>
+                            <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">
+                                Kalender
+                            </a>
+                        </nav>
+
+                        {/* Authentication Links */}
+                        <div className="auth-buttons flex space-x-4">
+                            {auth.user ? (
+                                <NavLink href={route('dashboard')}>Dashboard</NavLink>
+                            ) : (
+                                <>
+                                    <NavLink href={route('login')}>Log in</NavLink>
+                                    <NavLink href={route('register')}>Register</NavLink>
+                                </>
+                            )}
+                        </div>
                     </div>
                 </header>
 

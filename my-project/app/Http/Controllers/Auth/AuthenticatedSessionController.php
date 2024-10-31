@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Validation\ValidationException;
+use App\Models\User;
+use App\Models\Role;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -27,14 +30,32 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(Request $request)
     {
-        $request->authenticate();
-
+        $request->validate([
+            'email' => ['required', 'string', 'email'],
+            'password' => ['required', 'string'],
+        ]);
+    
+        if (!Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+            throw ValidationException::withMessages([
+                'email' => __('auth.failed'),
+            ]);
+        }
+    
         $request->session()->regenerate();
-
-        return redirect()->intended(route('dashboard', absolute: false));
-    }
+    
+        // Ambil user dari database dengan eager loading pada relasi roles
+        $user = User::with('roles')->find(Auth::id());
+    
+        // Redirect ke dashboard admin jika user memiliki peran admin
+        if ($user && $user->hasRole('admin')) {
+            return redirect()->intended(route('admin.dashboard'));
+        }
+    
+        // Jika bukan admin, arahkan ke dashboard user
+        return redirect()->intended(route('dashboard'));
+    }    
 
     /**
      * Destroy an authenticated session.
