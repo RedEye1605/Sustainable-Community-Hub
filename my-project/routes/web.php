@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\AdminController;
 
+// Rute publik untuk melihat daftar proyek dan detail proyek tanpa login
+Route::resource('projects', ProjectController::class)->except(['edit', 'destroy']);
+
 // Rute untuk Admin Dashboard (memerlukan autentikasi dan role admin)
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
@@ -26,12 +29,11 @@ Route::get('/', function () {
 
 // Rute Dashboard untuk Pengguna Biasa (memerlukan autentikasi dan verifikasi email)
 Route::middleware(['auth', 'verified'])->get('/dashboard', function () {
-    return Inertia::render('UserDashboard'); // Sesuaikan dengan komponen dashboard yang tersedia
+    return Inertia::render('UserDashboard'); 
 })->name('dashboard');
 
 // Rute untuk Manajemen Proyek (akses login diperlukan)
 Route::middleware('auth')->group(function () {
-    Route::resource('projects', ProjectController::class)->except(['edit', 'destroy']);
     Route::get('projects/{project}/edit', [ProjectController::class, 'edit'])->name('projects.edit');
     Route::put('projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
     Route::delete('projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
