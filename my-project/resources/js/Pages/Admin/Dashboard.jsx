@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 
 export default function Dashboard() {
     const { users = [], roles = [] } = usePage().props;
+    const { csrf_token } = usePage().props;
 
     useEffect(() => {
         console.log("Users:", users);
@@ -30,6 +31,7 @@ export default function Dashboard() {
                                         <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Email</th>
                                         <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Current Role</th>
                                         <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Assign Role</th>
+                                        <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Unassign Role</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -44,18 +46,21 @@ export default function Dashboard() {
                                                     </span>
                                                 ))}
                                             </td>
+                                            
+                                            {/* Assign Role Form */}
                                             <td className="px-6 py-4 border-b">
-                                                <form method="POST" action={route('admin.assign-role')} className="flex items-center">
-                                                    {/* CSRF Token */}
-                                                    <input type="hidden" name="_token" value={usePage().props.csrf_token} />
+                                                <form method="POST" action={route('admin.assign-role')} className="flex items-center space-x-2">
+                                                    <input type="hidden" name="_token" value={csrf_token} /> {/* CSRF token */}
                                                     <input type="hidden" name="user_id" value={user.id} />
-                                                    
+
                                                     <select
                                                         name="role_name"
-                                                        className="border-gray-300 rounded-md p-2 mr-2 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition duration-150 ease-in-out"
+                                                        className="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition duration-150 ease-in-out text-gray-700 bg-gray-50 hover:bg-white cursor-pointer"
                                                         defaultValue=""
                                                     >
-                                                        <option value="" disabled>Pilih Role</option>
+                                                        <option value="" disabled className="text-gray-400">
+                                                            Pilih Role
+                                                        </option>
                                                         {roles.map(role => (
                                                             <option key={role.name} value={role.name}>
                                                                 {role.display_name}
@@ -65,9 +70,39 @@ export default function Dashboard() {
 
                                                     <button
                                                         type="submit"
-                                                        className="bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 transition duration-150 ease-in-out"
+                                                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 transition duration-150 ease-in-out"
                                                     >
                                                         Assign
+                                                    </button>
+                                                </form>
+                                            </td>
+
+                                            {/* Unassign Role Form */}
+                                            <td className="px-6 py-4 border-b">
+                                                <form method="POST" action={route('admin.unassign-role')} className="flex items-center space-x-2">
+                                                    <input type="hidden" name="_token" value={csrf_token} /> {/* CSRF token */}
+                                                    <input type="hidden" name="user_id" value={user.id} />
+
+                                                    <select
+                                                        name="role_name"
+                                                        className="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-red-400 focus:border-red-400 transition duration-150 ease-in-out text-gray-700 bg-gray-50 hover:bg-white cursor-pointer"
+                                                        defaultValue=""
+                                                    >
+                                                        <option value="" disabled className="text-gray-400">
+                                                            Pilih Role untuk dihapus
+                                                        </option>
+                                                        {user.roles.map(role => (
+                                                            <option key={role.name} value={role.name}>
+                                                                {role.display_name}
+                                                            </option>
+                                                        ))}
+                                                    </select>
+
+                                                    <button
+                                                        type="submit"
+                                                        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-50 transition duration-150 ease-in-out"
+                                                    >
+                                                        Unassign
                                                     </button>
                                                 </form>
                                             </td>

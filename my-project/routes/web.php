@@ -11,6 +11,7 @@ use App\Http\Controllers\AdminController;
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::post('/admin/assign-role', [AdminController::class, 'assignRole'])->name('admin.assign-role');
+    Route::post('/admin/unassign-role', [AdminController::class, 'unassignRole'])->name('admin.unassign-role');
 });
 
 // Rute untuk Welcome Page
@@ -35,12 +36,6 @@ Route::middleware('auth')->group(function () {
     Route::put('projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
     Route::delete('projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
 });
-
-// // Rute untuk Manajemen Proyek (akses login diperlukan)
-// Route::middleware('auth')->group(function () {
-//     Route::resource('projects', ProjectController::class)->except(['edit', 'destroy']);
-//     Route::resource('projects', ProjectController::class)->only(['edit', 'destroy'])->middleware('auth');
-// });
 
 // Rute untuk Manajemen Profil (akses login diperlukan)
 Route::middleware('auth')->group(function () {

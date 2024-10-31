@@ -6,11 +6,13 @@ use App\Models\Project;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class ProjectController extends Controller
 {
+    use AuthorizesRequests;
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource (akses publik).
      */
     public function index()
     {
@@ -21,18 +23,21 @@ class ProjectController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new resource (hanya untuk admin).
      */
     public function create()
     {
+        $this->authorize('create', Project::class); // Policy untuk admin
         return Inertia::render('Proyek/CreateProjectPage');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created resource in storage (hanya untuk admin).
      */
     public function store(Request $request)
     {
+        $this->authorize('create', Project::class); // Policy untuk admin
+        
         $validatedData = $request->validate([
             'namaProyek' => 'required|max:100',
             'deskripsiProyek' => 'nullable',
@@ -58,7 +63,7 @@ class ProjectController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified resource (akses publik).
      */
     public function show(Project $project)
     {
@@ -69,20 +74,23 @@ class ProjectController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing the specified resource (hanya untuk admin).
      */
     public function edit(Project $project)
     {
+        $this->authorize('update', $project); // Policy untuk admin
         return Inertia::render('Proyek/ProjectEdit', [
             'project' => $project,
         ]);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified resource in storage (hanya untuk admin).
      */
     public function update(Request $request, Project $project)
     {
+        $this->authorize('update', $project); // Policy untuk admin
+
         $validatedData = $request->validate([
             'namaProyek' => 'required|max:100',
             'deskripsiProyek' => 'nullable',
@@ -109,12 +117,13 @@ class ProjectController extends Controller
         return redirect()->route('projects.index')->with('success', 'Proyek berhasil diperbarui.');
     }
 
-
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified resource from storage (hanya untuk admin).
      */
     public function destroy(Project $project)
     {
+        $this->authorize('delete', $project); // Policy untuk admin
+
         // Hapus gambar dari storage jika ada
         if ($project->imageUrl && Storage::disk('public')->exists(str_replace('/storage/', '', $project->imageUrl))) {
             Storage::disk('public')->delete(str_replace('/storage/', '', $project->imageUrl));
@@ -126,5 +135,3 @@ class ProjectController extends Controller
         return redirect()->route('projects.index')->with('success', 'Proyek berhasil dihapus.');
     }
 }
-
-
