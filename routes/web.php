@@ -8,10 +8,10 @@ use Inertia\Inertia;
 use App\Http\Controllers\AdminController;
 
 // Rute publik untuk melihat daftar proyek dan detail proyek tanpa login
-Route::resource('projects', ProjectController::class)->except(['edit', 'destroy']);
+Route::resource('projects', ProjectController::class);
 
 // Rute untuk Admin Dashboard (memerlukan autentikasi dan role admin)
-Route::middleware(['auth', 'role:admin'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::post('/admin/assign-role', [AdminController::class, 'assignRole'])->name('admin.assign-role');
     Route::post('/admin/unassign-role', [AdminController::class, 'unassignRole'])->name('admin.unassign-role');
