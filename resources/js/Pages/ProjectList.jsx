@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
+import Modal from '../components/Modal';
+import Login from './Auth/Login';
+import Register from './Auth/Register';
 import '../../css/app.css';
 
 // Reusable components
@@ -46,6 +49,8 @@ const Card = ({ href, imageSrc, imageAlt, title, description, children }) => (
 const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
     const { projects, flash } = usePage().props;
     const successMessage = flash && flash.success ? flash.success : null;
+    const [isLoginOpen, setIsLoginOpen] = useState(false);
+    const [isRegisterOpen, setIsRegisterOpen] = useState(false);
 
     return (
         <>
@@ -89,11 +94,19 @@ const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
                         {/* Authentication Links */}
                         <div className="auth-buttons flex space-x-4">
                             {auth.user ? (
-                                <NavLink href={route('dashboard')}>Dashboard</NavLink>
+                                auth.user.roles && auth.user.roles.some(role => role.name === 'admin') ? (
+                                    <Link href={route('admin.dashboard')}>Dashboard</Link>
+                                ) : (
+                                    <Link href={route('dashboard')}>Dashboard</Link>
+                                )                                
                             ) : (
                                 <>
-                                    <NavLink href={route('login')}>Log in</NavLink>
-                                    <NavLink href={route('register')}>Register</NavLink>
+                                    <button onClick={() => setIsLoginOpen(true)} className="text-gray-800 dark:text-white hover:text-[#FF2D20]">
+                                        Log in
+                                    </button>
+                                    <button onClick={() => setIsRegisterOpen(true)} className="text-gray-800 dark:text-white hover:text-[#FF2D20]">
+                                        Register
+                                    </button>
                                 </>
                             )}
                         </div>
@@ -107,6 +120,20 @@ const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
                             {successMessage}
                         </div>
                     )}
+
+                    {/* Login Modal */}
+                    <Modal show={isLoginOpen} onClose={() => setIsLoginOpen(false)} maxWidth="md">
+                        <div className="p-4">
+                            <Login />
+                        </div>
+                    </Modal>
+
+                    {/* Register Modal */}
+                    <Modal show={isRegisterOpen} onClose={() => setIsRegisterOpen(false)} maxWidth="md">
+                        <div className="p-3">
+                            <Register />
+                        </div>
+                    </Modal>
                     
                     {/* Project List Section */}
                     <section className="py-12 px-6 max-w-7xl mx-auto">

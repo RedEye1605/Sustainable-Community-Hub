@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
+import Modal from '../components/Modal';
+import Login from './Auth/Login';
+import Register from './Auth/Register';
 import '../../css/app.css';
 
 // Reusable components
@@ -43,8 +46,9 @@ const Card = ({ href, imageSrc, imageAlt, title, description, children }) => (
     </a>
 );
 
-export default function Welcome({ auth, laravelVersion, phpVersion }) {
-    console.log("Auth User:", auth.user);    
+export default function Welcome({ auth, laravelVersion, phpVersion }) {   
+    const [isLoginOpen, setIsLoginOpen] = useState(false);
+    const [isRegisterOpen, setIsRegisterOpen] = useState(false);
 
     return (
         <>
@@ -56,7 +60,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     <div className="container mx-auto flex justify-between items-center">
                         
                         {/* Logo / Title */}
-                        <h1 className="text-xl font-extrabold text-gray-900 dark:text-white">
+                        <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">
                             Sustainable Community Hub
                         </h1>
 
@@ -95,8 +99,12 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                 )                                
                             ) : (
                                 <>
-                                    <Link href={route('login')}>Log in</Link>
-                                    <Link href={route('register')}>Register</Link>
+                                    <button onClick={() => setIsLoginOpen(true)} className="text-gray-800 dark:text-white hover:text-[#FF2D20]">
+                                        Log in
+                                    </button>
+                                    <button onClick={() => setIsRegisterOpen(true)} className="text-gray-800 dark:text-white hover:text-[#FF2D20]">
+                                        Register
+                                    </button>
                                 </>
                             )}
                         </div>
@@ -104,6 +112,20 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                 </header>
 
                 <main>
+                    {/* Login Modal */}
+                    <Modal show={isLoginOpen} onClose={() => setIsLoginOpen(false)} maxWidth="md">
+                        <div className="p-4">
+                            <Login />
+                        </div>
+                    </Modal>
+
+                    {/* Register Modal */}
+                    <Modal show={isRegisterOpen} onClose={() => setIsRegisterOpen(false)} maxWidth="md">
+                        <div className="p-3">
+                            <Register />
+                        </div>
+                    </Modal>
+
                     {/* Hero Section */}
                     <section className="hero py-16 text-center bg-gradient-to-r from-green-400 to-teal-500 text-white">
                         <h2 className="text-5xl font-bold">Bergabunglah dengan kami!</h2>
