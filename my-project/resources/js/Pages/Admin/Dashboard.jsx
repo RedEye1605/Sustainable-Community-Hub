@@ -6,11 +6,6 @@ export default function Dashboard() {
     const { users = [], roles = [] } = usePage().props;
     const { csrf_token } = usePage().props;
 
-    useEffect(() => {
-        console.log("Users:", users);
-        console.log("Roles:", roles);
-    }, [users, roles]);
-
     return (
         <AuthenticatedLayout
             header={<h2 className="text-2xl font-semibold leading-tight text-gray-800">Admin Dashboard</h2>}

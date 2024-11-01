@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import '../../css/app.css';
 
 // Reusable components
@@ -43,7 +43,9 @@ const Card = ({ href, imageSrc, imageAlt, title, description, children }) => (
     </a>
 );
 
-export default function App({ auth, laravelVersion, phpVersion }) {
+export default function Welcome({ auth, laravelVersion, phpVersion }) {
+    console.log("Auth User:", auth.user);    
+
     return (
         <>
             <Head title="Sustainable Community Hub" />
@@ -86,11 +88,15 @@ export default function App({ auth, laravelVersion, phpVersion }) {
                         {/* Authentication Links */}
                         <div className="auth-buttons flex space-x-4">
                             {auth.user ? (
-                                <NavLink href={route('dashboard')}>Dashboard</NavLink>
+                                auth.user.roles && auth.user.roles.some(role => role.name === 'admin') ? (
+                                    <Link href={route('admin.dashboard')}>Dashboard</Link>
+                                ) : (
+                                    <Link href={route('dashboard')}>Dashboard</Link>
+                                )                                
                             ) : (
                                 <>
-                                    <NavLink href={route('login')}>Log in</NavLink>
-                                    <NavLink href={route('register')}>Register</NavLink>
+                                    <Link href={route('login')}>Log in</Link>
+                                    <Link href={route('register')}>Register</Link>
                                 </>
                             )}
                         </div>
