@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
-import Modal from '../components/Modal';
+import Modal from '../Components/Modal';
 import Login from './Auth/Login';
 import Register from './Auth/Register';
 import '../../css/app.css';
