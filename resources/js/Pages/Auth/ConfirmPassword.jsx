@@ -2,7 +2,6 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm } from '@inertiajs/react';
 
 export default function ConfirmPassword() {
@@ -12,14 +11,13 @@ export default function ConfirmPassword() {
 
     const submit = (e) => {
         e.preventDefault();
-
         post(route('password.confirm'), {
             onFinish: () => reset('password'),
         });
     };
 
     return (
-        <GuestLayout>
+        <div className="w-full max-w-sm p-4">
             <Head title="Confirm Password" />
 
             <div className="mb-4 text-sm text-gray-600">
@@ -30,17 +28,15 @@ export default function ConfirmPassword() {
             <form onSubmit={submit}>
                 <div className="mt-4">
                     <InputLabel htmlFor="password" value="Password" />
-
                     <TextInput
                         id="password"
                         type="password"
                         name="password"
                         value={data.password}
                         className="mt-1 block w-full"
-                        isFocused={true}
+                        isFocused
                         onChange={(e) => setData('password', e.target.value)}
                     />
-
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
@@ -50,6 +46,6 @@ export default function ConfirmPassword() {
                     </PrimaryButton>
                 </div>
             </form>
-        </GuestLayout>
+        </div>
     );
 }

@@ -1,7 +1,6 @@
 import InputError from '@/Components/InputError';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm } from '@inertiajs/react';
 
 export default function ForgotPassword({ status }) {
@@ -11,12 +10,11 @@ export default function ForgotPassword({ status }) {
 
     const submit = (e) => {
         e.preventDefault();
-
         post(route('password.email'));
     };
 
     return (
-        <GuestLayout>
+        <div className="w-full max-w-sm p-4">
             <Head title="Forgot Password" />
 
             <div className="mb-4 text-sm text-gray-600">
@@ -38,18 +36,18 @@ export default function ForgotPassword({ status }) {
                     name="email"
                     value={data.email}
                     className="mt-1 block w-full"
-                    isFocused={true}
+                    isFocused
                     onChange={(e) => setData('email', e.target.value)}
                 />
 
                 <InputError message={errors.email} className="mt-2" />
 
                 <div className="mt-4 flex items-center justify-end">
-                    <PrimaryButton className="ms-4" disabled={processing}>
+                    <PrimaryButton className="ml-4" disabled={processing}>
                         Email Password Reset Link
                     </PrimaryButton>
                 </div>
             </form>
-        </GuestLayout>
+        </div>
     );
 }

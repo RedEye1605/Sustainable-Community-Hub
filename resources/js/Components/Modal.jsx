@@ -3,13 +3,12 @@ import { Dialog, Transition } from '@headlessui/react';
 export default function Modal({
     children,
     show = false,
-    maxWidth = '2xl',
+    maxWidth = 'sm',
     closeable = true,
     onClose = () => {},
     enterTransition = 'ease-out duration-300',
     leaveTransition = 'ease-in duration-200',
-    minHeight = '10px', 
-    maxHeight = '80vh' 
+    maxHeight = '60vh', // Atur tinggi maksimum yang lebih rendah untuk modal
 }) {
     const close = () => {
         if (closeable) {
@@ -30,7 +29,7 @@ export default function Modal({
             <Dialog
                 as="div"
                 id="modal"
-                className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 transition-all sm:px-0"
+                className="fixed inset-0 z-50 flex items-center justify-center px-4 py-4 transition-all sm:px-0"
                 onClose={close}
             >
                 {/* Semi-transparent Overlay */}
@@ -55,8 +54,8 @@ export default function Modal({
                     leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                 >
                     <div
-                        className={`mb-6 transform overflow-hidden rounded-lg bg-white shadow-xl transition-all sm:mx-auto sm:w-full ${maxWidthClass}`}
-                        style={{ minHeight, maxHeight }}
+                        className={`transform overflow-auto rounded-lg bg-white shadow-xl transition-all sm:mx-auto sm:w-full ${maxWidthClass}`}
+                        style={{ maxHeight }} // Terapkan tinggi maksimum baru
                     >
                         {/* Close Button */}
                         {closeable && (
@@ -68,7 +67,7 @@ export default function Modal({
                                 &times;
                             </button>
                         )}
-                        <div className="p-6">
+                        <div className="p-4"> {/* Sesuaikan padding jika perlu */}
                             {children}
                         </div>
                     </div>

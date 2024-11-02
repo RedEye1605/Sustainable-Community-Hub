@@ -3,10 +3,10 @@ import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
-import GuestLayout from '@/Layouts/GuestLayout';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
+import ApplicationLogo from '@/Components/ApplicationLogo';
 
-export default function Login({ status, canResetPassword }) {
+export default function Login({ status, canResetPassword, onForgotPasswordClick }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: '',
         password: '',
@@ -15,15 +15,18 @@ export default function Login({ status, canResetPassword }) {
 
     const submit = (e) => {
         e.preventDefault();
-
         post(route('login'), {
             onFinish: () => reset('password'),
         });
     };
 
     return (
-        <GuestLayout>
+        <div className="w-full max-w-sm p-4">
             <Head title="Log in" />
+            {/* Logo */}
+            <div className="flex justify-center mb-6">
+                <ApplicationLogo className="h-16 w-16" />
+            </div>
 
             {status && (
                 <div className="mb-4 text-sm font-medium text-green-600">
@@ -34,7 +37,6 @@ export default function Login({ status, canResetPassword }) {
             <form onSubmit={submit}>
                 <div>
                     <InputLabel htmlFor="email" value="Email" />
-
                     <TextInput
                         id="email"
                         type="email"
@@ -42,16 +44,14 @@ export default function Login({ status, canResetPassword }) {
                         value={data.email}
                         className="mt-1 block w-full"
                         autoComplete="username"
-                        isFocused={true}
+                        isFocused
                         onChange={(e) => setData('email', e.target.value)}
                     />
-
                     <InputError message={errors.email} className="mt-2" />
                 </div>
 
                 <div className="mt-4">
                     <InputLabel htmlFor="password" value="Password" />
-
                     <TextInput
                         id="password"
                         type="password"
@@ -61,7 +61,6 @@ export default function Login({ status, canResetPassword }) {
                         autoComplete="current-password"
                         onChange={(e) => setData('password', e.target.value)}
                     />
-
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
@@ -70,11 +69,9 @@ export default function Login({ status, canResetPassword }) {
                         <Checkbox
                             name="remember"
                             checked={data.remember}
-                            onChange={(e) =>
-                                setData('remember', e.target.checked)
-                            }
+                            onChange={(e) => setData('remember', e.target.checked)}
                         />
-                        <span className="ms-2 text-sm text-gray-600">
+                        <span className="ml-2 text-sm text-gray-600">
                             Remember me
                         </span>
                     </label>
@@ -82,19 +79,20 @@ export default function Login({ status, canResetPassword }) {
 
                 <div className="mt-4 flex items-center justify-end">
                     {canResetPassword && (
-                        <Link
-                            href={route('password.request')}
+                        <button
+                            type="button"
+                            onClick={onForgotPasswordClick} // Panggil `onForgotPasswordClick`
                             className="rounded-md text-sm text-gray-600 underline hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                            style={{ display: 'inline', visibility: 'visible' }} // Tambahkan ini untuk memastikan teks terlihat
                         >
                             Forgot your password?
-                        </Link>
+                        </button>                    
                     )}
-
-                    <PrimaryButton className="ms-4" disabled={processing}>
+                    <PrimaryButton className="ml-4" disabled={processing}>
                         Log in
                     </PrimaryButton>
                 </div>
             </form>
-        </GuestLayout>
+        </div>
     );
 }

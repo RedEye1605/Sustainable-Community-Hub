@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import Modal from '../Components/Modal';
+import ConfirmPassword from './Auth/ConfirmPassword';
+import ForgotPassword from './Auth/ForgotPassword';
 import Login from './Auth/Login';
 import Register from './Auth/Register';
+import ResetPassword from './Auth/ResetPassword';
+import VerifyEmail from './Auth/VerifyEmail';
 import '../../css/app.css';
 
 // Reusable components
@@ -49,8 +53,36 @@ const Card = ({ href, imageSrc, imageAlt, title, description, children }) => (
 const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
     const { projects, flash } = usePage().props;
     const successMessage = flash && flash.success ? flash.success : null;
+
+    // State untuk menangani buka dan tutup modal
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+    const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+    const [isConfirmPasswordOpen, setIsConfirmPasswordOpen] = useState(false);
+    const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false);
+    const [isVerifyEmailOpen, setIsVerifyEmailOpen] = useState(false);
+
+    // Fungsi untuk membuka modal Forgot Password dari Login
+    const openForgotPasswordModal = () => {
+        setIsLoginOpen(false);  // Tutup modal Login
+        setIsForgotPasswordOpen(true);  // Buka modal Forgot Password
+    };
+
+    // Fungsi untuk membuka modal Login dari Register
+    const openLoginFromRegister = () => {
+        setIsRegisterOpen(false);  // Tutup modal Register
+        setIsLoginOpen(true);      // Buka modal Login
+    };
+
+    // Handler untuk membuka modal Confirm Password
+    const openConfirmPasswordModal = () => {
+        setIsConfirmPasswordOpen(true);
+    };
+
+    const openVerifyEmailModal = () => {
+        setIsRegisterOpen(false);
+        setIsVerifyEmailOpen(true);
+    };
 
     return (
         <>
@@ -124,14 +156,67 @@ const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
                     {/* Login Modal */}
                     <Modal show={isLoginOpen} onClose={() => setIsLoginOpen(false)} maxWidth="md">
                         <div className="p-4">
-                            <Login />
+                            <Login 
+                                canResetPassword={true} 
+                                onForgotPasswordClick={() => {
+                                    setIsLoginOpen(false);
+                                    setIsForgotPasswordOpen(true);
+                                }} 
+                            />
                         </div>
                     </Modal>
 
                     {/* Register Modal */}
                     <Modal show={isRegisterOpen} onClose={() => setIsRegisterOpen(false)} maxWidth="md">
-                        <div className="p-3">
-                            <Register />
+                        <div className="p-4">
+                            <Register 
+                                onLoginClick={() => {
+                                    setIsRegisterOpen(false); 
+                                    setIsLoginOpen(true);
+                                }}
+                                onVerifyEmailClick={() => {
+                                    setIsRegisterOpen(false); 
+                                    setIsVerifyEmailOpen(true);
+                                }}
+                            />
+                        </div>
+                    </Modal>
+
+                    {/* Forgot Password Modal */}
+                    <Modal show={isForgotPasswordOpen} onClose={() => setIsForgotPasswordOpen(false)} maxWidth="md">
+                        <div className="p-4">
+                            <ForgotPassword 
+                                onResetPasswordClick={() => {
+                                    setIsForgotPasswordOpen(false); 
+                                    setIsResetPasswordOpen(true);
+                                }} 
+                            />
+                        </div>
+                    </Modal>
+
+                    {/* Confirm Password Modal */}
+                    <Modal show={isConfirmPasswordOpen} onClose={() => setIsConfirmPasswordOpen(false)} maxWidth="md">
+                        <div className="p-4">
+                            <ConfirmPassword />
+                        </div>
+                    </Modal>
+
+                    {/* Reset Password Modal */}
+                    <Modal show={isResetPasswordOpen} onClose={() => setIsResetPasswordOpen(false)} maxWidth="md">
+                        <div className="p-4">
+                            <ResetPassword 
+                                onConfirmPasswordClick={() => {
+                                    setIsResetPasswordOpen(false); 
+                                    setIsConfirmPasswordOpen(true);
+                                }}
+                            />
+                        </div>
+                    </Modal>
+
+                    {/* Verify Email Modal */}
+                    <Modal show={isVerifyEmailOpen} onClose={() => setIsVerifyEmailOpen(false)} maxWidth="md">
+                        <div className="p-4">
+                            <VerifyEmail />
                         </div>
                     </Modal>
                     
