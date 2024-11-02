@@ -1,2 +1,6 @@
+# Mengabaikan semua file
 *
-!.gitignore
+
+# Mengecualikan semua isi dalam folder ini
+!*/
+!*.*
