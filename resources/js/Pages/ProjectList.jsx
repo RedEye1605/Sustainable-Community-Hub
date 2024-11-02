@@ -64,14 +64,14 @@ const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
 
     // Fungsi untuk membuka modal Forgot Password dari Login
     const openForgotPasswordModal = () => {
-        setIsLoginOpen(false);  // Tutup modal Login
-        setIsForgotPasswordOpen(true);  // Buka modal Forgot Password
+        setIsLoginOpen(false);  
+        setIsForgotPasswordOpen(true);  
     };
 
     // Fungsi untuk membuka modal Login dari Register
     const openLoginFromRegister = () => {
-        setIsRegisterOpen(false);  // Tutup modal Register
-        setIsLoginOpen(true);      // Buka modal Login
+        setIsRegisterOpen(false);  
+        setIsLoginOpen(true);   
     };
 
     // Handler untuk membuka modal Confirm Password
@@ -184,14 +184,14 @@ const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
 
                     {/* Forgot Password Modal */}
                     <Modal show={isForgotPasswordOpen} onClose={() => setIsForgotPasswordOpen(false)} maxWidth="md">
-                        <div className="p-4">
-                            <ForgotPassword 
-                                onResetPasswordClick={() => {
-                                    setIsForgotPasswordOpen(false); 
-                                    setIsResetPasswordOpen(true);
-                                }} 
-                            />
-                        </div>
+                    <div className="p-4">
+                        <ForgotPassword 
+                            onResetPasswordRequested={() => {
+                                setIsForgotPasswordOpen(false);
+                                setIsResetPasswordOpen(true);
+                            }} 
+                        />
+                    </div>
                     </Modal>
 
                     {/* Confirm Password Modal */}
@@ -204,12 +204,7 @@ const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
                     {/* Reset Password Modal */}
                     <Modal show={isResetPasswordOpen} onClose={() => setIsResetPasswordOpen(false)} maxWidth="md">
                         <div className="p-4">
-                            <ResetPassword 
-                                onConfirmPasswordClick={() => {
-                                    setIsResetPasswordOpen(false); 
-                                    setIsConfirmPasswordOpen(true);
-                                }}
-                            />
+                            <ResetPassword />
                         </div>
                     </Modal>
 

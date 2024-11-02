@@ -3,14 +3,21 @@ import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import { Head, useForm } from '@inertiajs/react';
 
-export default function ForgotPassword({ status }) {
+export default function ForgotPassword({ status, onResetPasswordRequested }) {
     const { data, setData, post, processing, errors } = useForm({
         email: '',
     });
 
     const submit = (e) => {
         e.preventDefault();
-        post(route('password.email'));
+        post(route('password.email'), {
+            onSuccess: () => {
+                // Panggil callback untuk membuka modal ResetPassword setelah sukses
+                if (onResetPasswordRequested) {
+                    onResetPasswordRequested();
+                }
+            },
+        });
     };
 
     return (

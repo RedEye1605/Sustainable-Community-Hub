@@ -75,11 +75,6 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
         setIsConfirmPasswordOpen(true);
     };
 
-    const openVerifyEmailModal = () => {
-        setIsRegisterOpen(false);
-        setIsVerifyEmailOpen(true);
-    };
-
     return (
         <>
             <Head title="Sustainable Community Hub" />
@@ -145,29 +140,14 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     {/* Login Modal */}
                     <Modal show={isLoginOpen} onClose={() => setIsLoginOpen(false)} maxWidth="md">
                         <div className="p-4">
-                            <Login 
-                                canResetPassword={true} 
-                                onForgotPasswordClick={() => {
-                                    setIsLoginOpen(false);
-                                    setIsForgotPasswordOpen(true);
-                                }} 
-                            />
+                            <Login canResetPassword={true} onForgotPasswordClick={openForgotPasswordModal} />
                         </div>
                     </Modal>
 
                     {/* Register Modal */}
                     <Modal show={isRegisterOpen} onClose={() => setIsRegisterOpen(false)} maxWidth="md">
                         <div className="p-4">
-                            <Register 
-                                onLoginClick={() => {
-                                    setIsRegisterOpen(false); 
-                                    setIsLoginOpen(true);
-                                }}
-                                onVerifyEmailClick={() => {
-                                    setIsRegisterOpen(false); 
-                                    setIsVerifyEmailOpen(true);
-                                }}
-                            />
+                            <Register onLoginClick={() => { setIsRegisterOpen(false); setIsLoginOpen(true); }} />
                         </div>
                     </Modal>
 
@@ -175,9 +155,9 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     <Modal show={isForgotPasswordOpen} onClose={() => setIsForgotPasswordOpen(false)} maxWidth="md">
                         <div className="p-4">
                             <ForgotPassword 
-                                onResetPasswordClick={() => {
-                                    setIsForgotPasswordOpen(false); 
-                                    setIsResetPasswordOpen(true);
+                                onResetPasswordRequested={() => {
+                                    setIsForgotPasswordOpen(false);  // Tutup modal ForgotPassword
+                                    setIsResetPasswordOpen(true);    // Buka modal ResetPassword
                                 }} 
                             />
                         </div>
@@ -193,12 +173,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     {/* Reset Password Modal */}
                     <Modal show={isResetPasswordOpen} onClose={() => setIsResetPasswordOpen(false)} maxWidth="md">
                         <div className="p-4">
-                            <ResetPassword 
-                                onConfirmPasswordClick={() => {
-                                    setIsResetPasswordOpen(false); 
-                                    setIsConfirmPasswordOpen(true);
-                                }}
-                            />
+                            <ResetPassword />
                         </div>
                     </Modal>
 
