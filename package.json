@@ -26,6 +26,7 @@
     },
     "dependencies": {
         "react-router-dom": "^6.27.0",
+        "swiper": "^11.1.14",
         "ziggy-js": "^2.3.1"
     }
 }

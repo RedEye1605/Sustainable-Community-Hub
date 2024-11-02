@@ -254,10 +254,12 @@ const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
                         <p className="mt-4 text-xs text-gray-400">© 2024 Sustainable Community Hub. All rights reserved.</p>
                     </div>
 
+                    {/* Center Section - CTA to Donate */}
                     <div className="footer-cta text-center md:text-left">
                         <h3 className="text-lg font-semibold text-white mb-2">Bantu Kami Menjaga Lingkungan</h3>
                         <p className="text-sm text-gray-300 mb-4">Setiap donasi membantu kami menciptakan perubahan nyata bagi lingkungan.</p>
-                        <button className="px-6 py-2 bg-[#FF2D20] text-white font-semibold rounded-full shadow-md hover:bg-[#e0241c] transition ease-in-out duration-200">
+                        <button className="px-6 py-2 bg-[#FF2D20] text-white font-semibold rounded-full hover:bg-[#e0241c] shadow-lg transition ease-in-out duration-300 transform hover:scale-105"
+                                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
                             Donasi Sekarang
                         </button>
                     </div>

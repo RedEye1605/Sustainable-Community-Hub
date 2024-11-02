@@ -7,6 +7,10 @@ import Login from './Auth/Login';
 import Register from './Auth/Register';
 import ResetPassword from './Auth/ResetPassword';
 import VerifyEmail from './Auth/VerifyEmail';
+import HeroCarousel from '../Components/HeroCarousel';
+import DonationBanner from '../Components/DonationBanner';
+import SectionSeparator from '@/Components/SectionSeperator';
+import Testimonial from '@/Components/Testimonial';
 import '../../css/app.css';
 
 // Reusable components
@@ -74,6 +78,15 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
     const openConfirmPasswordModal = () => {
         setIsConfirmPasswordOpen(true);
     };
+
+    //Carousel
+    const slides = [
+        { image: '/storage/images/Carousel/pexels-thirdman-7656742.jpg', title: 'Selamat Datang di Komunitas Hijau', description: 'Mari bersama menjaga lingkungan!' },
+        { image: '/storage/images/Carousel/pexels-ron-lach-9037596.jpg', title: 'Bersihkan Pantai Bersama', description: 'Aksi nyata untuk laut yang lebih bersih.' },
+        { image: '/storage/images/Carousel/pexels-walter-cordero-682282228-25961210.jpg', title: 'Tanam Pohon untuk Masa Depan', description: 'Satu pohon untuk kehidupan yang lebih baik.' },
+        { image: '/storage/images/Carousel/pexels-katerina-holmes-5905918.jpg', title: 'Edukasi Generasi Muda', description: 'Membangun kesadaran lingkungan sejak dini.' },
+        { image: '/storage/images/Carousel/pexels-julia-m-cameron-6994992.jpg', title: 'Donasi untuk Masa Depan Hijau', description: 'Setiap donasi membantu membuat perubahan nyata.' },
+    ];
 
     return (
         <>
@@ -185,19 +198,60 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     </Modal>
 
                     {/* Hero Section */}
-                    <section className="hero py-16 text-center bg-gradient-to-r from-green-400 to-teal-500 text-white">
-                        <h2 className="text-5xl font-bold">Bergabunglah dengan kami!</h2>
-                        <p className="mt-4 text-lg">Menjadi bagian dari aksi untuk membuat dunia yang lebih hijau!</p>
-                        <input type="text" placeholder="Pencarian" className="mt-6 px-6 py-3 rounded-full w-3/4 md:w-1/2 lg:w-1/3 text-gray-800 focus:outline-none focus:ring-2 focus:ring-[#FF2D20]" />
-                    </section>
+                    <HeroCarousel slides={slides} searchPlaceholder="Cari inisiatif hijau di dekat Anda" />
+
+                    <SectionSeparator text="Aksi Nyata untuk Masa Depan yang Lebih Hijau" />
 
                     {/* Donation Banner */}
-                    <section className="donation-banner py-16 bg-[#FF2D20] text-white text-center">
-                        <h2 className="text-4xl font-bold mb-4">Bantu Kami Membuat Dunia Lebih Hijau</h2>
-                        <p className="text-lg mb-6">Setiap donasi yang Anda berikan membantu kami dalam mencapai tujuan lingkungan yang lebih bersih dan sehat.</p>
-                        <button className="px-6 py-3 bg-white text-[#FF2D20] font-semibold rounded-lg hover:bg-gray-200 transition ease-in-out duration-200">
-                            Donasi Sekarang
-                        </button>
+                    <DonationBanner />
+
+                    {/* Impact Section */}
+                    <section className="impact-section py-16 text-center bg-gray-50 dark:bg-gray-900">
+                        <h2 className="text-4xl font-extrabold mb-8 text-gray-800 dark:text-white">
+                            Dampak Positif yang Telah Kita Ciptakan
+                        </h2>
+                        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
+                            {/* Individual impact cards with hover effect */}
+                            {[
+                                { count: "10,000+", label: "Pohon Ditanam" },
+                                { count: "500+", label: "Kilogram Sampah Dikumpulkan" },
+                                { count: "300+", label: "Relawan Terlibat" },
+                                { count: "20+", label: "Kegiatan Dijalankan" },
+                            ].map((impact, index) => (
+                                <div key={index} className="hover:scale-105 transition-transform duration-300">
+                                    <h3 className="text-3xl font-semibold text-green-600 dark:text-green-300">{impact.count}</h3>
+                                    <p className="text-lg text-gray-700 dark:text-gray-400">{impact.label}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </section>
+
+                    <SectionSeparator />
+
+                    {/* Testimonials Section */}
+                    <Testimonial />
+
+                    <SectionSeparator />
+
+                    {/* How to Help Section */}
+                    <section className="how-to-help py-16 text-center bg-gray-50 dark:bg-gray-900">
+                        <h2 className="text-4xl font-extrabold mb-8 text-gray-800 dark:text-white">Bagaimana Anda Bisa Membantu</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+                            {/* Help options with animated hover effect */}
+                            {[
+                                { title: "Donasi", description: "Dukung proyek kami dengan berdonasi untuk keberlanjutan lingkungan." },
+                                { title: "Jadi Relawan", description: "Bergabung dengan komunitas untuk aksi nyata di lapangan." },
+                                { title: "Bagikan", description: "Sebarkan informasi tentang misi kami kepada teman-teman Anda." },
+                            ].map((help, index) => (
+                                <div
+                                    key={index}
+                                    className="p-6 bg-white dark:bg-gray-800 shadow-lg rounded-lg transform transition hover:scale-105 hover:shadow-xl duration-300"
+                                >
+                                    <h3 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2">{help.title}</h3>
+                                    <p className="text-gray-600 dark:text-gray-400">{help.description}</p>
+                                </div>
+                            ))}
+                        </div>
                     </section>
 
                     {/* Information Cards Section */}
@@ -285,7 +339,8 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     <div className="footer-cta text-center md:text-left">
                         <h3 className="text-lg font-semibold text-white mb-2">Bantu Kami Menjaga Lingkungan</h3>
                         <p className="text-sm text-gray-300 mb-4">Setiap donasi membantu kami menciptakan perubahan nyata bagi lingkungan.</p>
-                        <button className="px-6 py-2 bg-[#FF2D20] text-white font-semibold rounded-full shadow-md hover:bg-[#e0241c] transition ease-in-out duration-200">
+                        <button className="px-6 py-2 bg-[#FF2D20] text-white font-semibold rounded-full hover:bg-[#e0241c] shadow-lg transition ease-in-out duration-300 transform hover:scale-105"
+                                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
                             Donasi Sekarang
                         </button>
                     </div>
