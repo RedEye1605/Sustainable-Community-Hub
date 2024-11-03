@@ -12,7 +12,7 @@ function HeroCarousel({ slides, searchPlaceholder }) {
                 pagination={{ clickable: true }}
                 autoplay={{ delay: 3000 }}
                 loop={true}
-                className="h-[500px] w-full"  // Tinggi diperbesar menjadi 500px
+                className="h-[500px] w-full" // Tinggi diperbesar menjadi 500px
             >
                 {slides.map((slide, index) => (
                     <SwiperSlide key={index} className="relative">
@@ -21,9 +21,10 @@ function HeroCarousel({ slides, searchPlaceholder }) {
                             alt={`Slide ${index + 1}`}
                             className="h-full w-full object-cover"
                         />
-                        <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center">
-                            <h2 className="text-4xl font-bold mb-2">{slide.title}</h2>
-                            <p className="mb-4 text-lg">{slide.description}</p>
+                        <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col items-center justify-center text-center px-4">
+                            {/* Tambahkan text-center dan px-4 untuk memastikan teks tetap rata tengah pada mobile */}
+                            <h2 className="text-4xl md:text-5xl font-bold mb-2">{slide.title}</h2>
+                            <p className="mb-4 text-lg md:text-xl">{slide.description}</p>
                         </div>
                     </SwiperSlide>
                 ))}
