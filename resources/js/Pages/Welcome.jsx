@@ -257,9 +257,6 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                     <SectionSeparator text="Aksi Nyata untuk Masa Depan yang Lebih Hijau" />
 
-                    {/* Donation Banner */}
-                    <DonationBanner />
-
                     {/* Impact Section */}
                     <section className="impact-section py-16 text-center bg-gray-50 dark:bg-gray-900">
                         <h2 className="text-4xl font-extrabold mb-8 text-gray-800 dark:text-white">
@@ -308,6 +305,9 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                             ))}
                         </div>
                     </section>
+
+                    {/* Donation Banner */}
+                    <DonationBanner />
 
                     {/* Information Cards Section */}
                     <section className="information-cards grid grid-cols-1 gap-8 py-12 px-6 lg:grid-cols-2">
