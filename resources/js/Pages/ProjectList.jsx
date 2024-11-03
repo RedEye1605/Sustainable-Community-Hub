@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import Modal from '../Components/Modal';
+import AddProject from '@/Components/AddButton';
 import ConfirmPassword from './Auth/ConfirmPassword';
 import ForgotPassword from './Auth/ForgotPassword';
 import Login from './Auth/Login';
@@ -136,24 +137,52 @@ const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
                         </a>
                     </nav>
 
-                    {/* Authentication Links */}
+                    {/* Authentication Links - Desktop */}
                     <div className="auth-buttons hidden md:flex space-x-4">
                         {auth.user ? (
-                            auth.user.roles && auth.user.roles.some(role => role.name === 'admin') ? (
-                                <Link href={route('admin.dashboard')} className="text-gray-800 dark:text-white hover:text-[#FF2D20] font-semibold transition-colors duration-300">
-                                    Dashboard
-                                </Link>
-                            ) : (
-                                <Link href={route('dashboard')} className="text-gray-800 dark:text-white hover:text-[#FF2D20] font-semibold transition-colors duration-300">
-                                    Dashboard
-                                </Link>
-                            )                                
+                            auth.user.roles && (
+                                auth.user.roles.some(role => role.name === 'admin') ? (
+                                    <Link
+                                        href={route('admin.dashboard')}
+                                        className="text-gray-800 dark:text-white hover:text-[#FF2D20] font-semibold transition-colors duration-300"
+                                    >
+                                        Dashboard
+                                    </Link>
+                                ) : auth.user.roles.some(role => role.name === 'pengelola proyek') ? (
+                                    <Link
+                                        href={route('project-manager.dashboard')}
+                                        className="text-gray-800 dark:text-white hover:text-[#FF2D20] font-semibold transition-colors duration-300"
+                                    >
+                                        Dashboard
+                                    </Link>
+                                ) : auth.user.roles.some(role => role.name === 'receiver') ? (
+                                    <Link
+                                        href={route('receiver.dashboard')}
+                                        className="text-gray-800 dark:text-white hover:text-[#FF2D20] font-semibold transition-colors duration-300"
+                                    >
+                                        Dashboard
+                                    </Link>
+                                ) : (
+                                    <Link
+                                        href={route('dashboard')}
+                                        className="text-gray-800 dark:text-white hover:text-[#FF2D20] font-semibold transition-colors duration-300"
+                                    >
+                                        Dashboard
+                                    </Link>
+                                )
+                            )
                         ) : (
                             <>
-                                <button onClick={() => setIsLoginOpen(true)} className="text-gray-800 dark:text-white hover:text-[#FF2D20] font-semibold transition-colors duration-300">
+                                <button
+                                    onClick={() => setIsLoginOpen(true)}
+                                    className="text-gray-800 dark:text-white hover:text-[#FF2D20] font-semibold transition-colors duration-300"
+                                >
                                     Log in
                                 </button>
-                                <button onClick={() => setIsRegisterOpen(true)} className="text-gray-800 dark:text-white hover:text-[#FF2D20] font-semibold transition-colors duration-300">
+                                <button
+                                    onClick={() => setIsRegisterOpen(true)}
+                                    className="text-gray-800 dark:text-white hover:text-[#FF2D20] font-semibold transition-colors duration-300"
+                                >
                                     Register
                                 </button>
                             </>
@@ -184,10 +213,24 @@ const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
                         {/* Authentication Links for Mobile */}
                         <div className="mt-6 flex flex-col space-y-2 border-t border-gray-600 pt-4">
                             {auth.user ? (
-                                auth.user.roles && auth.user.roles.some(role => role.name === 'admin') ? (
-                                    <Link href={route('admin.dashboard')} className="hover:text-[#FF2D20]">Dashboard</Link>
-                                ) : (
-                                    <Link href={route('dashboard')} className="hover:text-[#FF2D20]">Dashboard</Link>
+                                auth.user.roles && (
+                                    auth.user.roles.some(role => role.name === 'admin') ? (
+                                        <Link href={route('admin.dashboard')} className="hover:text-[#FF2D20]">
+                                            Dashboard
+                                        </Link>
+                                    ) : auth.user.roles.some(role => role.name === 'pengelola proyek') ? (
+                                        <Link href={route('project-manager.dashboard')} className="hover:text-[#FF2D20]">
+                                            Dashboard
+                                        </Link>
+                                    ) : auth.user.roles.some(role => role.name === 'receiver') ? (
+                                        <Link href={route('receiver.dashboard')} className="hover:text-[#FF2D20]">
+                                            Dashboard
+                                        </Link>
+                                    ) : (
+                                        <Link href={route('dashboard')} className="hover:text-[#FF2D20]">
+                                            Dashboard
+                                        </Link>
+                                    )
                                 )
                             ) : (
                                 <>
@@ -277,13 +320,8 @@ const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
                     {/* Project List Section */}
                     <section className="py-12 px-6 max-w-7xl mx-auto">
                         <SectionHeader title="Daftar Proyek" />
-                        <div className="flex justify-end mb-6">
-                            <Link
-                                href={route('projects.create')}
-                                className="px-5 py-2 bg-[#FF2D20] text-white rounded-full font-semibold shadow-md hover:bg-[#e0241c] transition"
-                            >
-                                Tambah Proyek
-                            </Link>
+                        <div>
+                        <AddProject />
                         </div>
                         <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                             {projects && projects.length > 0 ? (

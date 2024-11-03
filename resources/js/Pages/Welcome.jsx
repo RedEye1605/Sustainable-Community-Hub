@@ -140,25 +140,57 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                         </a>
                     </nav>
 
-                    {/* Authentication Links */}
+                    {/* Authentication Links - Desktop */}
                     <div className="auth-buttons hidden md:flex space-x-4">
                         {auth.user ? (
-                            auth.user.roles && auth.user.roles.some(role => role.name === 'admin') ? (
-                                <Link href={route('admin.dashboard')}>Dashboard</Link>
-                            ) : (
-                                <Link href={route('dashboard')}>Dashboard</Link>
-                            )                                
+                            auth.user.roles && (
+                                auth.user.roles.some(role => role.name === 'admin') ? (
+                                    <Link
+                                        href={route('admin.dashboard')}
+                                        className="text-gray-800 dark:text-white hover:text-[#FF2D20] font-semibold transition-colors duration-300"
+                                    >
+                                        Dashboard
+                                    </Link>
+                                ) : auth.user.roles.some(role => role.name === 'pengelola proyek') ? (
+                                    <Link
+                                        href={route('project-manager.dashboard')}
+                                        className="text-gray-800 dark:text-white hover:text-[#FF2D20] font-semibold transition-colors duration-300"
+                                    >
+                                        Dashboard
+                                    </Link>
+                                ) : auth.user.roles.some(role => role.name === 'receiver') ? (
+                                    <Link
+                                        href={route('receiver.dashboard')}
+                                        className="text-gray-800 dark:text-white hover:text-[#FF2D20] font-semibold transition-colors duration-300"
+                                    >
+                                        Dashboard
+                                    </Link>
+                                ) : (
+                                    <Link
+                                        href={route('dashboard')}
+                                        className="text-gray-800 dark:text-white hover:text-[#FF2D20] font-semibold transition-colors duration-300"
+                                    >
+                                        Dashboard
+                                    </Link>
+                                )
+                            )
                         ) : (
                             <>
-                                <button onClick={() => setIsLoginOpen(true)} className="text-gray-800 dark:text-white hover:text-[#FF2D20]">
+                                <button
+                                    onClick={() => setIsLoginOpen(true)}
+                                    className="text-gray-800 dark:text-white hover:text-[#FF2D20] font-semibold transition-colors duration-300"
+                                >
                                     Log in
                                 </button>
-                                <button onClick={() => setIsRegisterOpen(true)} className="text-gray-800 dark:text-white hover:text-[#FF2D20]">
+                                <button
+                                    onClick={() => setIsRegisterOpen(true)}
+                                    className="text-gray-800 dark:text-white hover:text-[#FF2D20] font-semibold transition-colors duration-300"
+                                >
                                     Register
                                 </button>
                             </>
                         )}
-                    </div>   
+                    </div>  
                 </div>
 
                 {/* Mobile Menu (Only Visible When isMenuOpen is True) */}
@@ -184,17 +216,31 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                         {/* Authentication Links for Mobile */}
                         <div className="mt-6 flex flex-col space-y-2 border-t border-gray-600 pt-4">
                             {auth.user ? (
-                                auth.user.roles && auth.user.roles.some(role => role.name === 'admin') ? (
-                                    <Link href={route('admin.dashboard')} className="hover:text-[#FF2D20]">Dashboard</Link>
-                                ) : (
-                                    <Link href={route('dashboard')} className="hover:text-[#FF2D20]">Dashboard</Link>
+                                auth.user.roles && (
+                                    auth.user.roles.some(role => role.name === 'admin') ? (
+                                        <Link href={route('admin.dashboard')} className="hover:text-[#FF2D20]">
+                                            Dashboard
+                                        </Link>
+                                    ) : auth.user.roles.some(role => role.name === 'pengelola proyek') ? (
+                                        <Link href={route('project-manager.dashboard')} className="hover:text-[#FF2D20]">
+                                            Dashboard
+                                        </Link>
+                                    ) : auth.user.roles.some(role => role.name === 'receiver') ? (
+                                        <Link href={route('receiver.dashboard')} className="hover:text-[#FF2D20]">
+                                            Dashboard
+                                        </Link>
+                                    ) : (
+                                        <Link href={route('dashboard')} className="hover:text-[#FF2D20]">
+                                            Dashboard
+                                        </Link>
+                                    )
                                 )
                             ) : (
                                 <>
-                                    <button onClick={() => setIsLoginOpen(true)} className="text-gray-300 hover:text-[#FF2D20]">
+                                    <button onClick={() => setIsLoginOpen(true)} className="text-gray-300 hover:text-[#FF2D20] font-semibold">
                                         Log in
                                     </button>
-                                    <button onClick={() => setIsRegisterOpen(true)} className="text-gray-300 hover:text-[#FF2D20] mt-1">
+                                    <button onClick={() => setIsRegisterOpen(true)} className="text-gray-300 hover:text-[#FF2D20] font-semibold mt-1">
                                         Register
                                     </button>
                                 </>

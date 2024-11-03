@@ -3,20 +3,35 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class ProjectController extends Controller
 {
     use AuthorizesRequests;
+    public function dashboard()
+    {
+        // Ambil proyek yang dikelola oleh user saat ini (dengan role 'pengelola')
+        $user = Auth::user();
+
+        $projects = $user->projects; // Mengambil proyek milik pengguna yang sedang login
+
+        return Inertia::render('project-manager/Dashboard', [
+            'projects' => $projects,
+        ]);
+    }
+
     /**
      * Display a listing of the resource (akses publik).
      */
     public function index()
     {
-        $projects = Project::all();
+        $projects = Project::all(); // Semua proyek dapat dilihat di halaman 'ProjectList'
+
         return Inertia::render('ProjectList', [
             'projects' => $projects,
         ]);
@@ -27,17 +42,19 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        $this->authorize('create', Project::class); // Policy untuk admin
+        $this->authorize('create', Project::class);
         return Inertia::render('Proyek/CreateProjectPage');
     }
 
     /**
-     * Store a newly created resource in storage (hanya untuk admin).
+     * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        $this->authorize('create', Project::class); // Policy untuk admin
+        // Memastikan pengguna memiliki izin untuk membuat proyek berdasarkan perannya
+        $this->authorize('create', Project::class); 
         
+        // Validasi data input
         $validatedData = $request->validate([
             'namaProyek' => 'required|max:100',
             'deskripsiProyek' => 'nullable',
@@ -48,18 +65,26 @@ class ProjectController extends Controller
         // Handle upload gambar jika ada
         $imageUrl = null;
         if ($request->hasFile('image')) {
-            $imageUrl = $request->file('image')->store('images/projects', 'public');
+            $imagePath = $request->file('image')->store('images/projects', 'public');
+            $imageUrl = Storage::url($imagePath);
         }
 
-        // Buat proyek baru
+        // Buat proyek baru dan tetapkan user_id untuk pengelola
         Project::create([
             'namaProyek' => $validatedData['namaProyek'],
             'deskripsiProyek' => $validatedData['deskripsiProyek'],
             'statusProyek' => $validatedData['statusProyek'],
-            'imageUrl' => $imageUrl ? Storage::url($imageUrl) : null,
+            'imageUrl' => $imageUrl,
+            'user_id' => Auth::id(), // Set owner proyek sebagai pengguna yang sedang login
         ]);
 
-        return redirect()->route('projects.index')->with('success', 'Proyek berhasil ditambahkan.');
+        // Periksa apakah pengguna memiliki peran 'pengelola' tanpa method hasRole
+        $userRoles = Auth::user()->roles->pluck('name')->toArray();
+        if (in_array('pengelola proyek', $userRoles)) {
+            return redirect()->route('project-manager.dashboard')->with('success', 'Proyek berhasil ditambahkan.');
+        } else {
+            return redirect()->route('projects.index')->with('success', 'Proyek berhasil ditambahkan.');
+        }
     }
 
     /**

@@ -38,9 +38,15 @@ const ProjectCreate = () => {
             formData.append('image', data.image);
         }
 
-        post('/projects', {
+        // Mengirim data menggunakan rute Laravel `projects.store`
+        post(route('projects.store'), {
             data: formData,
             headers: { 'Content-Type': 'multipart/form-data' },
+            onSuccess: () => {
+                // Reset atau bisa redirect jika ingin
+                setData({ namaProyek: '', deskripsiProyek: '', statusProyek: '', image: null });
+                setPreview(null);
+            },
         });
     };
 

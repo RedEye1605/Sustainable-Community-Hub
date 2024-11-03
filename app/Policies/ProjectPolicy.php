@@ -19,17 +19,19 @@ class ProjectPolicy
     // /**
     //  * Determine whether the user can view the model.
     //  */
-    // public function view(User $user, Project $project): bool
-    // {
-    //     //
-    // }
+    public function view(User $user, Project $project): bool
+    {
+        // Allow access if the user is the project owner or an admin
+        return $user->id === $project->user_id || $user->roles->contains('name', 'admin');
+    }
 
     /**
      * Determine whether the user can create models.
      */
     public function create(User $user): bool
     {
-        return $user->hasRole('admin');
+        // Allow creation if the user is an admin or a project manager
+        return $user->roles->contains('name', 'admin') || $user->roles->contains('name', 'pengelola proyek');
     }
 
     /**
@@ -37,7 +39,8 @@ class ProjectPolicy
      */
     public function update(User $user, Project $project): bool
     {
-        return $user->hasRole('admin');
+        // Allow update if the user is the project owner or an admin
+        return $user->id === $project->user_id || $user->roles->contains('name', 'admin');
     }
 
     /**
@@ -45,7 +48,8 @@ class ProjectPolicy
      */
     public function delete(User $user, Project $project): bool
     {
-        return $user->hasRole('admin');
+        // Allow deletion if the user is the project owner or an admin
+        return $user->id === $project->user_id || $user->roles->contains('name', 'admin');
     }
 
     /**

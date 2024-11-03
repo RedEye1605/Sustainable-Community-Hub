@@ -24,6 +24,11 @@ class User extends Authenticatable
         'password',
     ];
 
+    public function projects()
+    {
+        return $this->hasMany(Project::class);
+    }
+
     // User.php model
     public function roles()
     {

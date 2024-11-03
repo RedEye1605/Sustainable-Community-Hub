@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -12,7 +11,6 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Validation\ValidationException;
 use App\Models\User;
-use App\Models\Role;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -45,17 +43,17 @@ class AuthenticatedSessionController extends Controller
     
         $request->session()->regenerate();
     
-        // Ambil user dari database dengan eager loading pada relasi roles
         $user = User::with('roles')->find(Auth::id());
     
-        // Redirect ke dashboard admin jika user memiliki peran admin
         if ($user && $user->hasRole('admin')) {
             return redirect()->intended(route('admin.dashboard'));
+        } elseif ($user && $user->hasRole('pengelola proyek')) {
+            return redirect()->intended(route('project-manager.dashboard'));
+        } else {
+            // Mengarahkan pengguna lain ke dashboard atau halaman lain yang sesuai
+            return redirect()->intended(route('dashboard'));
         }
-    
-        // Jika bukan admin, arahkan ke dashboard user
-        return redirect()->intended(route('dashboard'));
-    }    
+    }
 
     /**
      * Destroy an authenticated session.
@@ -65,7 +63,6 @@ class AuthenticatedSessionController extends Controller
         Auth::guard('web')->logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
         return redirect('/');
