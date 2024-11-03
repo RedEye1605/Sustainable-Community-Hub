@@ -1,4 +1,5 @@
 import { Dialog, Transition } from '@headlessui/react';
+import { useEffect, useRef } from 'react';
 
 export default function Modal({
     children,
@@ -10,11 +11,29 @@ export default function Modal({
     leaveTransition = 'ease-in duration-200',
     maxHeight = '60vh', // Atur tinggi maksimum yang lebih rendah untuk modal
 }) {
+    const modalRef = useRef(null); // Tambahkan ref untuk modal
+
     const close = () => {
         if (closeable) {
             onClose();
         }
     };
+
+    useEffect(() => {
+        function handleClickOutside(event) {
+            // Jika klik di luar modal, maka tutup modal
+            if (modalRef.current && !modalRef.current.contains(event.target)) {
+                close();
+            }
+        }
+
+        // Tambahkan event listener untuk klik
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            // Hapus event listener saat komponen unmount
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [closeable, onClose]);
 
     const maxWidthClass = {
         sm: 'sm:max-w-sm',
@@ -31,6 +50,7 @@ export default function Modal({
                 id="modal"
                 className="fixed inset-0 z-50 flex items-center justify-center px-4 py-4 transition-all sm:px-0"
                 onClose={close}
+                static={false}
             >
                 {/* Semi-transparent Overlay */}
                 <Transition.Child
@@ -54,8 +74,9 @@ export default function Modal({
                     leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                 >
                     <div
+                        ref={modalRef} // Tambahkan ref untuk mendeteksi klik di luar modal
                         className={`transform overflow-auto rounded-lg bg-white shadow-xl transition-all sm:mx-auto sm:w-full ${maxWidthClass}`}
-                        style={{ maxHeight }} // Terapkan tinggi maksimum baru
+                        style={{ maxHeight }}
                     >
                         {/* Close Button */}
                         {closeable && (

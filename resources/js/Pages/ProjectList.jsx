@@ -7,6 +7,7 @@ import Login from './Auth/Login';
 import Register from './Auth/Register';
 import ResetPassword from './Auth/ResetPassword';
 import VerifyEmail from './Auth/VerifyEmail';
+import { Transition } from '@headlessui/react';
 import '../../css/app.css';
 
 // Reusable components
@@ -61,6 +62,7 @@ const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
     const [isConfirmPasswordOpen, setIsConfirmPasswordOpen] = useState(false);
     const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false);
     const [isVerifyEmailOpen, setIsVerifyEmailOpen] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false)
 
     // Fungsi untuk membuka modal Forgot Password dari Login
     const openForgotPasswordModal = () => {
@@ -91,59 +93,116 @@ const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
                 
                 {/* Header */}
                 <header className="header py-6 px-10 bg-white dark:bg-gray-800 shadow-md">
-                    <div className="container mx-auto flex justify-between items-center">
+                <div className="container mx-auto flex justify-between items-center">
+                    
+                    {/* Logo / Title */}
+                    <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">
+                        Sustainable Community Hub
+                    </h1>
+
+                    {/* Hamburger Menu Button (Mobile Only) */}
+                    <button 
+                        className="text-gray-700 dark:text-gray-300 md:hidden" 
+                        onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    >
+                        {/* Icon for Hamburger Menu */}
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={isMenuOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"}></path>
+                        </svg>
+                    </button>
+
+                    {/* Navigation Links (Visible on Desktop) */}
+                    <nav className="hidden md:flex flex-grow justify-center space-x-6 text-gray-700 dark:text-gray-300">
+                        <a href={route('home')} className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">
+                            Home
+                        </a>
+                        <a href="#" className="text-[#FF2D20] font-semibold border-b-2 border-[#FF2D20] hover:border-[#e0241c] transition duration-300">
+                            Event
+                        </a>
+                        <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">
+                            Donasi
+                        </a>
+                        <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">
+                            Forum Diskusi
+                        </a>
+                        <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">
+                            Artikel
+                        </a>
+                        <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">
+                            Peta
+                        </a>
+                        <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">
+                            Kalender
+                        </a>
+                    </nav>
+
+                    {/* Authentication Links */}
+                    <div className="auth-buttons hidden md:flex space-x-4">
+                        {auth.user ? (
+                            auth.user.roles && auth.user.roles.some(role => role.name === 'admin') ? (
+                                <Link href={route('admin.dashboard')} className="text-gray-800 dark:text-white hover:text-[#FF2D20] font-semibold transition-colors duration-300">
+                                    Dashboard
+                                </Link>
+                            ) : (
+                                <Link href={route('dashboard')} className="text-gray-800 dark:text-white hover:text-[#FF2D20] font-semibold transition-colors duration-300">
+                                    Dashboard
+                                </Link>
+                            )                                
+                        ) : (
+                            <>
+                                <button onClick={() => setIsLoginOpen(true)} className="text-gray-800 dark:text-white hover:text-[#FF2D20] font-semibold transition-colors duration-300">
+                                    Log in
+                                </button>
+                                <button onClick={() => setIsRegisterOpen(true)} className="text-gray-800 dark:text-white hover:text-[#FF2D20] font-semibold transition-colors duration-300">
+                                    Register
+                                </button>
+                            </>
+                        )}
+                    </div>
+                </div>
+
+                {/* Mobile Menu (Only Visible When isMenuOpen is True) */}
+                <Transition
+                    show={isMenuOpen}
+                    enter="transition ease-out duration-100 transform"
+                    enterFrom="opacity-0 scale-95"
+                    enterTo="opacity-100 scale-100"
+                    leave="transition ease-in duration-75 transform"
+                    leaveFrom="opacity-100 scale-100"
+                    leaveTo="opacity-0 scale-95"
+                    className="md:hidden"
+                >
+                    <nav className="flex flex-col space-y-4 p-6 bg-gray-800 text-white rounded-lg shadow-lg">
+                        <a href={route('home')} className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">Home</a>
+                        <a href="#" className="text-[#FF2D20] font-semibold border-b-2 border-[#FF2D20] hover:border-[#e0241c] transition duration-300">Event</a>
+                        <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">Donasi</a>
+                        <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">Forum Diskusi</a>
+                        <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">Artikel</a>
+                        <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">Peta</a>
+                        <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">Kalender</a>
                         
-                        {/* Logo / Title */}
-                        <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">
-                            Sustainable Community Hub
-                        </h1>
-
-                        {/* Navigation Links (Centered) */}
-                        <nav className="flex-grow flex justify-center space-x-6 text-gray-700 dark:text-gray-300">
-                            <a href={route('home')} className="hover:text-[#FF2D20] transition-colors duration-200">
-                                Home
-                            </a>
-                            <a href="#" className="text-[#FF2D20] font-semibold border-b-2 border-[#FF2D20] hover:border-[#e0241c] transition duration-200">
-                                Event
-                            </a>
-                            <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">
-                                Donasi
-                            </a>
-                            <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">
-                                Forum Diskusi
-                            </a>
-                            <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">
-                                Artikel
-                            </a>
-                            <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">
-                                Peta
-                            </a>
-                            <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">
-                                Kalender
-                            </a>
-                        </nav>
-
-                        {/* Authentication Links */}
-                        <div className="auth-buttons flex space-x-4">
+                        {/* Authentication Links for Mobile */}
+                        <div className="mt-6 flex flex-col space-y-2 border-t border-gray-600 pt-4">
                             {auth.user ? (
                                 auth.user.roles && auth.user.roles.some(role => role.name === 'admin') ? (
-                                    <Link href={route('admin.dashboard')}>Dashboard</Link>
+                                    <Link href={route('admin.dashboard')} className="hover:text-[#FF2D20]">Dashboard</Link>
                                 ) : (
-                                    <Link href={route('dashboard')}>Dashboard</Link>
-                                )                                
+                                    <Link href={route('dashboard')} className="hover:text-[#FF2D20]">Dashboard</Link>
+                                )
                             ) : (
                                 <>
-                                    <button onClick={() => setIsLoginOpen(true)} className="text-gray-800 dark:text-white hover:text-[#FF2D20]">
+                                    <button onClick={() => setIsLoginOpen(true)} className="text-gray-300 hover:text-[#FF2D20] font-semibold">
                                         Log in
                                     </button>
-                                    <button onClick={() => setIsRegisterOpen(true)} className="text-gray-800 dark:text-white hover:text-[#FF2D20]">
+                                    <button onClick={() => setIsRegisterOpen(true)} className="text-gray-300 hover:text-[#FF2D20] font-semibold mt-1">
                                         Register
                                     </button>
                                 </>
                             )}
                         </div>
-                    </div>
-                </header>
+                    </nav>
+                </Transition>
+            </header>
 
                 <main>
                     {/* Success Message */}
