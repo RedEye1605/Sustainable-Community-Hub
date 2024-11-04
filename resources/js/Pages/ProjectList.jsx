@@ -27,6 +27,14 @@ const SectionHeader = ({ title }) => (
     </h2>
 );
 
+// Function to truncate description text by character count
+const truncateText = (text, charLimit) => {
+    if (text.length > charLimit) {
+        return text.slice(0, charLimit) + '...';
+    }
+    return text;
+};
+
 const Card = ({ href, imageSrc, imageAlt, title, description, children }) => (
     <a
         href={href}
@@ -43,7 +51,7 @@ const Card = ({ href, imageSrc, imageAlt, title, description, children }) => (
         <div className="relative flex flex-col gap-4">
             <SectionHeader title={title} />
             <p className="text-sm text-gray-700 dark:text-gray-300">
-                {description}
+                {truncateText(description, 100)} {/* Limit to 100 characters */}
             </p>
             <div className="mt-4">
                 {children}
@@ -332,7 +340,7 @@ const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
                                         imageSrc={project.imageUrl}
                                         imageAlt={`Gambar dari proyek ${project.namaProyek}`}
                                         title={project.namaProyek}
-                                        description="Deskripsi singkat proyek..."
+                                        description={`${project.deskripsiProyek}`}
                                     >
                                         <button className="px-4 py-2 bg-[#FF2D20] text-white rounded-lg hover:bg-[#e0241c]">Lihat Detail</button>
                                     </Card>
