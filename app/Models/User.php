@@ -2,19 +2,16 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use App\Models\Role;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
     /**
-     * The attributes that are mass assignable.
+     * Attributes that are mass assignable.
      *
      * @var array<int, string>
      */
@@ -24,23 +21,52 @@ class User extends Authenticatable
         'password',
     ];
 
+    /**
+     * Relasi ke proyek yang dimiliki oleh user.
+     */
     public function projects()
     {
         return $this->hasMany(Project::class);
     }
 
-    // User.php model
+    /**
+     * Relasi many-to-many ke peran (roles) user.
+     */
     public function roles()
     {
         return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id');
-    }    
+    }
 
-    public function hasRole($roleName) {
+    /**
+     * Mengecek apakah user memiliki peran tertentu.
+     *
+     * @param string $roleName
+     * @return bool
+     */
+    public function hasRole($roleName)
+    {
         return $this->roles()->where('name', $roleName)->exists();
     }
 
     /**
-     * The attributes that should be hidden for serialization.
+     * Relasi ke volunteer yang dilakukan oleh user.
+     */
+    public function volunteers()
+    {
+        return $this->hasMany(Volunteer::class);
+    }
+
+    /**
+     * Relasi ke proyek yang diikuti oleh user sebagai volunteer.
+     */
+    public function volunteeredProjects()
+    {
+        return $this->belongsToMany(Project::class, 'volunteers')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Attributes that should be hidden for serialization.
      *
      * @var array<int, string>
      */
@@ -50,7 +76,7 @@ class User extends Authenticatable
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * Attributes that should be cast.
      *
      * @return array<string, string>
      */

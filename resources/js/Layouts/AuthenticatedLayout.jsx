@@ -14,8 +14,8 @@ export default function AuthenticatedLayout({ header, children }) {
         ? route('admin.dashboard')
         : user.roles.some(role => role.name === 'pengelola proyek')
         ? route('project-manager.dashboard')
-        : user.roles.some(role => role.name === 'donatur receiver')
-        ? route('donatur-receiver.dashboard')
+        // : user.roles.some(role => role.name === 'donatur receiver')
+        // ? route('donatur-receiver.dashboard')
         : route('dashboard'); // Default untuk pengguna biasa
 
     return (

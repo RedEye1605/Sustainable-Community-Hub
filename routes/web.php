@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\AdminController;
 use Illuminate\Foundation\Application;
+use App\Http\Controllers\VolunteerController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -20,6 +21,9 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
+// Rute Dashboard untuk Pengguna Biasa (memerlukan autentikasi dan verifikasi email)
+Route::middleware(['auth', 'verified'])->get('/dashboard', [ProjectController::class, 'userDashboard'])->name('dashboard');
+
 // Rute untuk Admin (akses penuh ke semua action kecuali `index` dan `show`)
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
@@ -32,11 +36,6 @@ Route::middleware(['auth', 'role:pengelola proyek'])->prefix('project-manager')-
     Route::get('/dashboard', [ProjectController::class, 'dashboard'])->name('project-manager.dashboard');
 });
 
-// Rute Dashboard untuk Pengguna Biasa (memerlukan autentikasi dan verifikasi email)
-Route::middleware(['auth', 'verified'])->get('/dashboard', function () {
-    return Inertia::render('UserDashboard');
-})->name('dashboard');
-
 // Rute untuk Manajemen Profil (akses login diperlukan)
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -48,7 +47,10 @@ Route::middleware('auth')->group(function () {
     Route::post('projects', [ProjectController::class, 'store'])->name('projects.store');
     Route::get('/Proyek/{project}/ProjectEdit', [ProjectController::class, 'edit'])->name('projects.edit');
     Route::put('projects/{project}', [ProjectController::class, 'update'])->name('projects.update');
-    Route::delete('projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');   
+    Route::delete('projects/{project}', [ProjectController::class, 'destroy'])->name('projects.destroy');
+    
+    Route::post('/projects/{projectId}/join', [VolunteerController::class, 'joinProject'])->name('projects.join');
+    Route::post('/projects/{projectId}/unfollow', [VolunteerController::class, 'unfollowProject'])->name('projects.unfollow');
 });
 
 // Autentikasi standar Laravel

@@ -1,9 +1,30 @@
 import { Link, usePage, router, Head } from '@inertiajs/react';
+import { useState } from 'react';
 import EditButton from '@/Components/EditButton';
 import DeleteButton from '@/Components/DeleteButton';
 
 export default function ProjectDetail() {
-    const { project } = usePage().props;
+    const { project, isVolunteer } = usePage().props;
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Fungsi untuk menangani klik pada tombol "Bergabung Sekarang"
+    const handleJoinProject = () => {
+        setIsLoading(true);
+        router.post(route('projects.join', project.id), {
+            onSuccess: () => {
+                setIsLoading(false);
+            },
+            onError: (errors) => {
+                setIsLoading(false);
+                if (errors.error) {
+                    alert(errors.error);
+                } else {
+                    alert('Terjadi kesalahan saat bergabung');
+                }
+            },
+            onFinish: () => setIsLoading(false),
+        });
+    };    
 
     if (!project) {
         return (
@@ -64,14 +85,17 @@ export default function ProjectDetail() {
                         </div>
                         <div className="flex flex-col items-center p-4 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md w-32">
                             <span className="text-gray-600 dark:text-gray-400 text-sm">Tanggal Mulai</span>
-                            <span className="text-lg font-semibold text-gray-800 dark:text-white">
-                                {project.startDate || 'TBA'}
+                            <span
+                                className="text-lg font-semibold text-gray-800 dark:text-white"
+                                title="Tanggal proyek akan dimulai"
+                            >
+                                {project.start_date || 'TBA'}
                             </span>
                         </div>
                         <div className="flex flex-col items-center p-4 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md w-32">
                             <span className="text-gray-600 dark:text-gray-400 text-sm">Jumlah Peserta</span>
                             <span className="text-lg font-semibold text-gray-800 dark:text-white">
-                                {project.participantCount || '0'}
+                                {project.participant_count || '0'}
                             </span>
                         </div>
                     </div>
@@ -91,8 +115,16 @@ export default function ProjectDetail() {
                             Gabung bersama kami untuk membuat perubahan yang berarti! Anda dapat memberikan kontribusi
                             sebagai peserta atau donatur.
                         </p>
-                        <button className="px-6 py-2 bg-[#FF2D20] text-white font-semibold rounded-lg shadow-md hover:bg-[#e0241c] transition ease-in-out duration-200">
-                            Bergabung Sekarang
+                        <button
+                            onClick={handleJoinProject}
+                            disabled={isVolunteer || project.participant_count >= project.required_participants || isLoading}
+                            className={`px-6 py-2 ${
+                                isVolunteer || project.participant_count >= project.required_participants || isLoading
+                                    ? 'bg-gray-400 cursor-not-allowed'
+                                    : 'bg-[#FF2D20] hover:bg-[#e0241c]'
+                            } text-white font-semibold rounded-lg shadow-md transition ease-in-out duration-200`}
+                        >
+                            {isVolunteer ? 'Anda sudah bergabung' : isLoading ? 'Loading...' : project.participant_count >= project.required_participants ? 'Proyek Penuh' : 'Bergabung Sekarang'}
                         </button>
                     </div>
 
