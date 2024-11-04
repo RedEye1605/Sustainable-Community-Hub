@@ -29,7 +29,7 @@ export default function ProjectManagerDashboard() {
                         <div className="flex justify-end mb-6">
                             <Link
                                 href={route('projects.create')}
-                                className="px-5 py-2 bg-green-500 text-white rounded-full font-semibold shadow-md hover:bg-green-600 transition"
+                                className="px-6 py-3 bg-green-500 text-white font-semibold rounded-md shadow-md hover:bg-green-600 transition duration-200 ease-in-out"
                             >
                                 Tambah Proyek
                             </Link>
@@ -50,11 +50,11 @@ export default function ProjectManagerDashboard() {
                                         <tr key={project.id} className="hover:bg-gray-50 transition duration-150 ease-in-out">
                                             <td className="px-6 py-4 border-b">{project.namaProyek}</td>
                                             <td className="px-6 py-4 border-b">{project.statusProyek}</td>
-                                            <td className="px-6 py-4 border-b space-x-2">
+                                            <td className="px-6 py-4 border-b flex space-x-3">
                                                 {/* Edit Button */}
                                                 <Link
                                                     href={route('projects.edit', project.id)}
-                                                    className="px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition duration-150 ease-in-out"
+                                                    className="px-5 py-2.5 bg-yellow-500 text-white font-semibold rounded-md shadow-md hover:bg-yellow-600 transition duration-200 ease-in-out"
                                                 >
                                                     Edit
                                                 </Link>
@@ -62,7 +62,7 @@ export default function ProjectManagerDashboard() {
                                                 {/* Delete Button */}
                                                 <button
                                                     onClick={() => handleDelete(project.id)}
-                                                    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-150 ease-in-out"
+                                                    className="px-5 py-2.5 bg-red-500 text-white font-semibold rounded-md shadow-md hover:bg-red-600 transition duration-200 ease-in-out"
                                                 >
                                                     Delete
                                                 </button>
