@@ -1,4 +1,6 @@
 import { Link, usePage, router, Head } from '@inertiajs/react';
+import EditButton from '@/Components/EditButton';
+import DeleteButton from '@/Components/DeleteButton';
 
 export default function ProjectDetail() {
     const { project } = usePage().props;
@@ -97,48 +99,10 @@ export default function ProjectDetail() {
                     {/* Action Buttons */}
                     <div className="mt-8 flex flex-wrap gap-4 justify-center">
                         {/* Edit Button */}
-                        <Link
-                            href={route('projects.edit', project.id)}
-                            className="group flex items-center gap-2 px-6 py-3 bg-yellow-500 text-white font-semibold rounded-lg shadow-lg hover:bg-yellow-600 hover:shadow-xl transition duration-200 ease-in-out transform hover:scale-105"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 transition-transform duration-200 group-hover:scale-110"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M11 3H5a2 2 0 00-2 2v16a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 010 3l-9 9L6 21l3.5-3.5 9-9a2.121 2.121 0 010-3z"
-                                />
-                            </svg>
-                            Edit
-                        </Link>
+                        <EditButton project={project} />
 
                         {/* Delete Button */}
-                        <button
-                            onClick={handleDelete}
-                            className="group flex items-center gap-2 px-6 py-3 bg-red-500 text-white font-semibold rounded-lg shadow-lg hover:bg-red-600 hover:shadow-xl transition duration-200 ease-in-out transform hover:scale-105"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-5 w-5 transition-transform duration-200 group-hover:scale-110"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M9 2l1 1h4l1-1h5v2H4V2h5zM4 7h16v13a2 2 0 01-2 2H6a2 2 0 01-2-2V7zm5 3h2v7H9v-7zm4 0h2v7h-2v-7z"
-                                />
-                            </svg>
-                            Hapus
-                        </button>
+                        <DeleteButton project={project} />
 
                         {/* Back to Projects List */}
                         <Link

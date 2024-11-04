@@ -1,10 +1,18 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, usePage, router } from '@inertiajs/react';
 import React from 'react';
 
 export default function ProjectManagerDashboard() {
-    const { projects = [] } = usePage().props; // Mendapatkan daftar proyek dari props
-    const { csrf_token } = usePage().props;
+    const { projects = [] } = usePage().props;
+
+    const handleDelete = (projectId) => {
+        if (confirm('Apakah Anda yakin ingin menghapus proyek ini?')) {
+            router.delete(route('projects.destroy', projectId), {
+                onSuccess: () => alert('Proyek berhasil dihapus!'),
+                onError: () => alert('Gagal menghapus proyek. Silakan coba lagi.'),
+            });
+        }
+    };
 
     return (
         <AuthenticatedLayout
@@ -52,25 +60,12 @@ export default function ProjectManagerDashboard() {
                                                 </Link>
 
                                                 {/* Delete Button */}
-                                                <form
-                                                    method="POST"
-                                                    action={route('projects.destroy', project.id)}
-                                                    className="inline"
-                                                    onSubmit={(e) => {
-                                                        if (!confirm('Apakah Anda yakin ingin menghapus proyek ini?')) {
-                                                            e.preventDefault();
-                                                        }
-                                                    }}
+                                                <button
+                                                    onClick={() => handleDelete(project.id)}
+                                                    className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-150 ease-in-out"
                                                 >
-                                                    <input type="hidden" name="_token" value={csrf_token} />
-                                                    <input type="hidden" name="_method" value="DELETE" />
-                                                    <button
-                                                        type="submit"
-                                                        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-150 ease-in-out"
-                                                    >
-                                                        Delete
-                                                    </button>
-                                                </form>
+                                                    Delete
+                                                </button>
                                             </td>
                                         </tr>
                                     ))}
