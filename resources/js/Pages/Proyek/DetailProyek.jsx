@@ -7,13 +7,11 @@ export default function ProjectDetail() {
     const { project, isVolunteer } = usePage().props;
     const [isLoading, setIsLoading] = useState(false);
 
-    // Fungsi untuk menangani klik pada tombol "Bergabung Sekarang"
+    // Function to handle the "Join Project" button click
     const handleJoinProject = () => {
         setIsLoading(true);
         router.post(route('projects.join', project.id), {
-            onSuccess: () => {
-                setIsLoading(false);
-            },
+            onSuccess: () => setIsLoading(false),
             onError: (errors) => {
                 setIsLoading(false);
                 if (errors.error) {
@@ -24,7 +22,7 @@ export default function ProjectDetail() {
             },
             onFinish: () => setIsLoading(false),
         });
-    };    
+    };
 
     if (!project) {
         return (
@@ -41,6 +39,8 @@ export default function ProjectDetail() {
             });
         }
     };
+
+    const isProjectInactive = !project.statusProyek;
 
     return (
         <>
@@ -80,15 +80,12 @@ export default function ProjectDetail() {
                         <div className="flex flex-col items-center p-4 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md w-32">
                             <span className="text-gray-600 dark:text-gray-400 text-sm">Status</span>
                             <span className="text-lg font-semibold text-gray-800 dark:text-white">
-                                {project.statusProyek}
+                                {project.statusProyek ? 'Aktif' : 'Tidak Aktif'}
                             </span>
                         </div>
                         <div className="flex flex-col items-center p-4 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md w-32">
                             <span className="text-gray-600 dark:text-gray-400 text-sm">Tanggal Mulai</span>
-                            <span
-                                className="text-lg font-semibold text-gray-800 dark:text-white"
-                                title="Tanggal proyek akan dimulai"
-                            >
+                            <span className="text-lg font-semibold text-gray-800 dark:text-white">
                                 {project.start_date || 'TBA'}
                             </span>
                         </div>
@@ -117,26 +114,29 @@ export default function ProjectDetail() {
                         </p>
                         <button
                             onClick={handleJoinProject}
-                            disabled={isVolunteer || project.participant_count >= project.required_participants || isLoading}
+                            disabled={isProjectInactive || isVolunteer || project.participant_count >= project.required_participants || isLoading}
                             className={`px-6 py-2 ${
-                                isVolunteer || project.participant_count >= project.required_participants || isLoading
+                                isProjectInactive || isVolunteer || project.participant_count >= project.required_participants || isLoading
                                     ? 'bg-gray-400 cursor-not-allowed'
                                     : 'bg-[#FF2D20] hover:bg-[#e0241c]'
                             } text-white font-semibold rounded-lg shadow-md transition ease-in-out duration-200`}
                         >
-                            {isVolunteer ? 'Anda sudah bergabung' : isLoading ? 'Loading...' : project.participant_count >= project.required_participants ? 'Proyek Penuh' : 'Bergabung Sekarang'}
+                            {isProjectInactive 
+                                ? 'Proyek Tidak Aktif' 
+                                : isVolunteer 
+                                ? 'Anda sudah bergabung' 
+                                : isLoading 
+                                ? 'Loading...' 
+                                : project.participant_count >= project.required_participants 
+                                ? 'Proyek Penuh' 
+                                : 'Bergabung Sekarang'}
                         </button>
                     </div>
 
                     {/* Action Buttons */}
                     <div className="mt-8 flex flex-wrap gap-4 justify-center">
-                        {/* Edit Button */}
                         <EditButton project={project} />
-
-                        {/* Delete Button */}
                         <DeleteButton project={project} />
-
-                        {/* Back to Projects List */}
                         <Link
                             href={route('projects.index')}
                             className="group flex items-center gap-2 px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-lg hover:bg-blue-600 hover:shadow-xl transition duration-200 ease-in-out transform hover:scale-105"

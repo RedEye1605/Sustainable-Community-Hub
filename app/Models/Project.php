@@ -17,6 +17,10 @@ class Project extends Model
         'start_date' 
     ];
 
+    protected $casts = [
+        'statusProyek' => 'boolean', // Menjamin bahwa statusProyek disimpan sebagai boolean
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);

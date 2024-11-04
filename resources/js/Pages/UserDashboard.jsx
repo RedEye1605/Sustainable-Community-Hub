@@ -3,14 +3,12 @@ import { Head, Link, usePage, router } from '@inertiajs/react';
 import { useState } from 'react';
 
 export default function Dashboard() {
-    // Ambil props dari Inertia, dan tetapkan `projects` dengan array kosong jika belum ada data
     const { projects = [] } = usePage().props;
-    const [loadingProjectId, setLoadingProjectId] = useState(null); // State untuk menangani loading per proyek
+    const [loadingProjectId, setLoadingProjectId] = useState(null);
 
-    // Fungsi untuk menangani pembatalan keikutsertaan proyek
     const handleUnfollowProject = (projectId) => {
         if (confirm('Apakah Anda yakin ingin membatalkan keikutsertaan Anda dalam proyek ini?')) {
-            setLoadingProjectId(projectId); // Set ID proyek yang sedang dalam proses loading
+            setLoadingProjectId(projectId);
             router.post(route('projects.unfollow', projectId), {
                 onSuccess: () => setLoadingProjectId(null),
                 onError: () => {
@@ -48,7 +46,15 @@ export default function Dashboard() {
                                                     </Link>
                                                 </h4>
                                                 <p className="text-gray-600 mb-2">{project.deskripsiProyek}</p>
-                                                <span className="inline-block bg-green-200 text-green-800 px-2 py-1 rounded text-sm">Status: {project.statusProyek}</span>
+                                                <span
+                                                    className={`inline-block px-2 py-1 rounded text-sm ${
+                                                        project.statusProyek
+                                                            ? 'bg-green-200 text-green-800'
+                                                            : 'bg-red-200 text-red-800'
+                                                    }`}
+                                                >
+                                                    Status: {project.statusProyek ? 'Aktif' : 'Tidak Aktif'}
+                                                </span>
                                             </div>
                                             <button
                                                 onClick={() => handleUnfollowProject(project.id)}

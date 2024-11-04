@@ -74,7 +74,7 @@ class ProjectController extends Controller
         $validatedData = $request->validate([
             'namaProyek' => 'required|max:100',
             'deskripsiProyek' => 'nullable',
-            'statusProyek' => 'required|max:50',
+            'statusProyek' => 'required|boolean',
             'start_date' => 'nullable|date',
             'required_participants' => 'required|integer|min:1',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
@@ -144,7 +144,7 @@ class ProjectController extends Controller
         $validatedData = $request->validate([
             'namaProyek' => 'required|max:100',
             'deskripsiProyek' => 'nullable',
-            'statusProyek' => 'required|max:50',
+            'statusProyek' => 'required|boolean',
             'start_date' => 'nullable|date',
             'required_participants' => 'required|integer|min:1',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
