@@ -30,9 +30,15 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [ProjectController::class, 'userDashboard'])->name('dashboard');
     
-    // Routes for donations
-    Route::post('/donations/{donationRequestId}/store', [DonationController::class, 'store'])->name('donations.store');
-    Route::delete('/donations/{id}', [DonationController::class, 'destroy'])->name('donations.destroy');
+    // User Donation Routes
+    Route::prefix('donations')->name('donations.')->group(function () {
+        Route::get('/{donationRequestId}/DonationFormPage', [DonationController::class, 'create'])->name('create'); // Display form to create donation
+        Route::post('/store/{donationRequestId}', [DonationController::class, 'store'])->name('store'); // Store donation
+        Route::get('/{donation}/edit', [DonationController::class, 'edit'])->name('edit'); // Edit donation
+        Route::put('/{donation}', [DonationController::class, 'update'])->name('update'); // Update donation
+        Route::delete('/{donation}', [DonationController::class, 'destroy'])->name('destroy'); // Delete donation
+        Route::get('/{donation}', [DonationController::class, 'show'])->name('show'); // Show donation details
+    });
 });
 
 // Admin Routes for full access, excluding index and show actions

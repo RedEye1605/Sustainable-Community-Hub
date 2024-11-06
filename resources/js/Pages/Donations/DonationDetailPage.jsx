@@ -1,54 +1,18 @@
-import React, { useState } from 'react';
-import { usePage, router, Link } from '@inertiajs/react';
-import {route} from 'ziggy-js';
+import React from 'react';
+import { usePage, Link } from '@inertiajs/react';
+import { route } from 'ziggy-js';
 
 export default function DonationDetailPage() {
-    const { donationRequest, auth } = usePage().props;
-    const [donationData, setDonationData] = useState({
-        type: donationRequest.category || 'barang', // Default to request category
-        amount: '',
-        item_description: '',
-        item_image: null,
-    });
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [errors, setErrors] = useState({});
+    const { donationRequest, donations = [], auth } = usePage().props;
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setDonationData((prevData) => ({ ...prevData, [name]: value }));
-    };
+    // Calculate total collected based on donation type
+    const totalCollected = donations.reduce((total, donation) => {
+        return total + (donationRequest.type === 'uang' ? donation.amount : 1);
+    }, 0);
 
-    const handleFileChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setDonationData((prevData) => ({ ...prevData, item_image: file }));
-        }
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        setIsSubmitting(true);
-
-        const formData = new FormData();
-        formData.append('type', donationData.type);
-        formData.append('amount', donationData.amount);
-        formData.append('item_description', donationData.item_description);
-        if (donationData.item_image) {
-            formData.append('item_image', donationData.item_image);
-        }
-
-        router.post(route('donations.store', donationRequest.id), formData, {
-            onSuccess: () => {
-                alert('Donasi berhasil disimpan!');
-                setDonationData({ type: 'barang', amount: '', item_description: '', item_image: null });
-                setIsSubmitting(false);
-            },
-            onError: (error) => {
-                setErrors(error);
-                setIsSubmitting(false);
-            },
-        });
-    };
+    // Calculate progress percentage
+    const target = donationRequest.type === 'uang' ? donationRequest.target_amount : donationRequest.target_items;
+    const progressPercentage = Math.min((totalCollected / target) * 100, 100).toFixed(2);
 
     return (
         <div className="min-h-screen p-6 lg:p-12 bg-gradient-to-r from-green-200 to-green-400 dark:from-gray-800 dark:to-gray-900 flex flex-col items-center">
@@ -61,69 +25,87 @@ export default function DonationDetailPage() {
                 <span>{donationRequest.title}</span>
             </nav>
 
+            {/* Title */}
             <h1 className="text-4xl font-extrabold text-gray-800 dark:text-white mb-8 text-center">
                 {donationRequest.title}
             </h1>
 
+            {/* Donation Request Details */}
             <div className="w-full max-w-3xl bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg space-y-6">
-                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-                    {donationRequest.description}
-                </p>
+                {/* Description */}
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{donationRequest.description}</p>
 
-                <span className="inline-block px-2 py-1 text-sm font-semibold bg-blue-100 dark:bg-blue-700 text-blue-800 dark:text-blue-200 rounded">
-                    Kategori: {donationRequest.category === 'uang' ? 'Uang' : 'Barang'}
-                </span>
-
-                {/* Donation Form */}
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    {donationRequest.category === 'uang' ? (
-                        <div>
-                            <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Jumlah Donasi (Rp)</label>
-                            <input
-                                type="number"
-                                name="amount"
-                                value={donationData.amount}
-                                onChange={handleInputChange}
-                                placeholder="Masukkan jumlah donasi"
-                                className="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 text-gray-900 dark:text-gray-200 bg-gray-50 dark:bg-gray-700"
-                                min="1"
-                                required
-                            />
-                            {errors.amount && <p className="text-red-500 text-sm mt-1">{errors.amount}</p>}
-                        </div>
-                    ) : (
-                        <>
-                            <div>
-                                <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Deskripsi Barang</label>
-                                <textarea
-                                    name="item_description"
-                                    value={donationData.item_description}
-                                    onChange={handleInputChange}
-                                    placeholder="Deskripsi barang yang ingin didonasikan"
-                                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 text-gray-900 dark:text-gray-200 bg-gray-50 dark:bg-gray-700"
-                                    required
-                                />
-                                {errors.item_description && <p className="text-red-500 text-sm mt-1">{errors.item_description}</p>}
-                            </div>
-
-                            <div>
-                                <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Foto Barang</label>
-                                <input type="file" onChange={handleFileChange} className="w-full" />
-                                {errors.item_image && <p className="text-red-500 text-sm mt-1">{errors.item_image}</p>}
-                            </div>
-                        </>
+                {/* Tags for Category and Target */}
+                <div className="flex flex-wrap items-center space-x-4">
+                    <span className="inline-block px-2 py-1 text-sm font-semibold bg-blue-100 dark:bg-blue-700 text-blue-800 dark:text-blue-200 rounded">
+                        Tipe Donasi: {donationRequest.type === 'uang' ? 'Uang' : 'Barang'}
+                    </span>
+                    {donationRequest.type !== 'uang' && (
+                        <span className="inline-block px-2 py-1 text-sm font-semibold bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded">
+                            Kategori: {donationRequest.category}
+                        </span>
                     )}
+                    <span className="inline-block px-2 py-1 text-sm font-semibold bg-green-100 dark:bg-green-700 text-green-800 dark:text-green-200 rounded">
+                        Target: {donationRequest.type === 'uang' ? `Rp ${donationRequest.target_amount}` : `${donationRequest.target_items} Barang`}
+                    </span>
+                </div>
 
-                    <div className="flex justify-center mt-8">
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="px-8 py-3 bg-indigo-500 text-white font-bold rounded-lg shadow-md hover:bg-indigo-600 transition duration-300"
-                        >
-                            {isSubmitting ? 'Menyimpan...' : 'Donasikan'}
-                        </button>
+                {/* Collected Amount/Items with Progress Bar */}
+                <div className="mt-6">
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-2">Total Terkumpul:</h3>
+                    <p className="text-lg text-gray-700 dark:text-gray-300 mb-2">
+                        {donationRequest.type === 'uang' ? `Rp ${totalCollected}` : `${totalCollected} Barang`} terkumpul dari target
+                    </p>
+                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4">
+                        <div
+                            className="bg-green-500 h-4 rounded-full transition-all duration-500"
+                            style={{ width: `${progressPercentage}%` }}
+                        ></div>
                     </div>
-                </form>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{progressPercentage}% tercapai</p>
+                </div>
+
+                {/* Donations Breakdown */}
+                <div className="mt-8">
+                    <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Daftar Donatur</h3>
+                    {donations.length > 0 ? (
+                        <ul className="space-y-4">
+                            {donations.map((donation, index) => (
+                                <li key={index} className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md">
+                                    <div className="flex justify-between">
+                                        <div>
+                                            <p className="text-gray-800 dark:text-gray-200 font-semibold">
+                                                {donation.user.name}
+                                            </p>
+                                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                                {donation.type === 'uang' ? `Donasi Uang: Rp ${donation.amount}` : `Donasi Barang: ${donation.item_description}`}
+                                            </p>
+                                        </div>
+                                        <span className={`px-2 py-1 text-xs font-semibold rounded-lg ${
+                                            donation.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                            donation.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                            'bg-red-100 text-red-800'
+                                        }`}>
+                                            {donation.status.charAt(0).toUpperCase() + donation.status.slice(1)}
+                                        </span>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p className="text-gray-600 dark:text-gray-400">Belum ada donatur.</p>
+                    )}
+                </div>
+
+                {/* Donation Call to Action */}
+                <div className="flex justify-center mt-10">
+                    <Link
+                        href={route('donations.create', { donationRequestId: donationRequest.id })}
+                        className="px-8 py-3 bg-indigo-500 text-white font-bold rounded-lg shadow-md hover:bg-indigo-600 transition duration-300"
+                    >
+                        Donasi Sekarang
+                    </Link>
+                </div>
             </div>
         </div>
     );

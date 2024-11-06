@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useForm, Link, router } from '@inertiajs/react';
-import {route} from 'ziggy-js';
+import { route } from 'ziggy-js';
 
 export default function EditDonationPage({ donation }) {
     const { data, setData, put, processing, errors } = useForm({
@@ -48,34 +48,61 @@ export default function EditDonationPage({ donation }) {
             <form onSubmit={handleSubmit} className="max-w-3xl w-full bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg space-y-6">
                 {data.type === 'uang' ? (
                     <div>
-                        <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Jumlah Donasi (Rp)</label>
+                        <label htmlFor="amount" className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                            Jumlah Donasi (Rp)
+                        </label>
                         <input
                             type="number"
-                            min="0"
+                            id="amount"
+                            name="amount"
                             value={data.amount}
                             onChange={(e) => setData('amount', e.target.value)}
+                            min="0"
                             className="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 text-gray-900 dark:text-gray-200 bg-gray-50 dark:bg-gray-700"
+                            aria-invalid={errors.amount ? "true" : "false"}
+                            aria-describedby="amountError"
+                            required
                         />
-                        {errors.amount && <p className="text-red-500 text-sm mt-1">{errors.amount}</p>}
+                        {errors.amount && <p id="amountError" className="text-red-500 text-sm mt-1">{errors.amount}</p>}
                     </div>
                 ) : (
                     <>
                         <div>
-                            <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Deskripsi Barang</label>
+                            <label htmlFor="item_description" className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                Deskripsi Barang
+                            </label>
                             <textarea
+                                id="item_description"
+                                name="item_description"
                                 value={data.item_description}
                                 onChange={(e) => setData('item_description', e.target.value)}
                                 className="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 text-gray-900 dark:text-gray-200 bg-gray-50 dark:bg-gray-700 h-32"
+                                aria-invalid={errors.item_description ? "true" : "false"}
+                                aria-describedby="descriptionError"
+                                required
                             ></textarea>
-                            {errors.item_description && <p className="text-red-500 text-sm mt-1">{errors.item_description}</p>}
+                            {errors.item_description && <p id="descriptionError" className="text-red-500 text-sm mt-1">{errors.item_description}</p>}
                         </div>
                         <div>
-                            <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Foto Barang</label>
-                            <input type="file" onChange={handleImageChange} className="block w-full" />
+                            <label htmlFor="item_image" className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                                Foto Barang
+                            </label>
+                            <input
+                                type="file"
+                                id="item_image"
+                                onChange={handleImageChange}
+                                className="block w-full"
+                                aria-describedby="imageError"
+                            />
                             {preview && (
-                                <img src={preview} alt="Preview" className="mt-4 w-full h-64 object-cover rounded-lg shadow-lg border border-gray-300 dark:border-gray-600" />
+                                <img
+                                    src={preview}
+                                    alt="Preview of the donation item"
+                                    className="mt-4 w-full h-64 object-cover rounded-lg shadow-lg border border-gray-300 dark:border-gray-600"
+                                    onError={(e) => e.target.style.display = 'none'}
+                                />
                             )}
-                            {errors.item_image && <p className="text-red-500 text-sm mt-1">{errors.item_image}</p>}
+                            {errors.item_image && <p id="imageError" className="text-red-500 text-sm mt-1">{errors.item_image}</p>}
                         </div>
                     </>
                 )}
@@ -85,20 +112,23 @@ export default function EditDonationPage({ donation }) {
                         type="submit"
                         disabled={processing}
                         className="px-8 py-3 bg-indigo-500 text-white font-bold rounded-lg shadow-md hover:bg-indigo-600 transition duration-300"
+                        aria-label="Update donation"
                     >
                         {processing ? 'Memproses...' : 'Update Donasi'}
                     </button>
                     <button
+                        type="button"
                         onClick={() => {
-                            if (confirm('Are you sure you want to delete this donation?')) {
+                            if (confirm('Apakah Anda yakin ingin menghapus donasi ini?')) {
                                 router.delete(route('donations.destroy', donation.id), {
-                                    onSuccess: () => alert('Donation deleted successfully'),
+                                    onSuccess: () => alert('Donasi berhasil dihapus!'),
                                 });
                             }
                         }}
-                        className="btn-delete"
+                        className="px-8 py-3 bg-red-500 text-white font-bold rounded-lg shadow-md hover:bg-red-600 transition duration-300"
+                        aria-label="Delete donation"
                     >
-                        Delete
+                        Hapus Donasi
                     </button>
                 </div>
             </form>

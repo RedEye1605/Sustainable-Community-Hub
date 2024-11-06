@@ -229,10 +229,8 @@ const DonationRequestList = () => {
             </header>
 
                 {/* Main Content */}
-                <main className="flex-grow p-6 lg:p-12 flex flex-col items-center">
-                    <h1 className="text-4xl font-extrabold text-gray-800 dark:text-white mb-8 text-center">
-                        Daftar Pengajuan Donasi
-                    </h1>
+                <main className="p-6 lg:p-12 flex flex-col items-center">
+                    <h1 className="text-4xl font-extrabold text-gray-800 dark:text-white mb-8">Daftar Permintaan Donasi</h1>
 
                     <div className="w-full max-w-4xl">
                         {donationRequests.length > 0 ? (
@@ -247,19 +245,25 @@ const DonationRequestList = () => {
                                                 {request.title}
                                             </Link>
                                             <p className="text-gray-600 dark:text-gray-400 mt-2">
-                                                {request.description.length > 100 ? request.description.substring(0, 100) + '...' : request.description}
+                                                {truncateText(request.description, 100)}
                                             </p>
-                                            <span className="inline-block px-2 py-1 mt-4 text-sm font-semibold bg-green-100 dark:bg-green-700 text-green-800 dark:text-green-200 rounded">
-                                                Kategori: {request.category === 'uang' ? 'Uang' : 'Barang'}
-                                            </span>
+                                            <div className="mt-4 flex space-x-4">
+                                                {/* Display only 'type' if type is 'uang', otherwise display both 'type' and 'category' */}
+                                                <span className="px-2 py-1 text-sm font-semibold bg-green-100 dark:bg-green-700 rounded text-green-800 dark:text-green-200">
+                                                    Tipe: {request.type === 'uang' ? 'Uang' : 'Barang'}
+                                                </span>
+                                                {request.type === 'barang' && (
+                                                    <span className="px-2 py-1 text-sm font-semibold bg-yellow-100 dark:bg-yellow-700 rounded text-yellow-800 dark:text-yellow-200">
+                                                        Kategori: {request.category}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
                                     </li>
                                 ))}
                             </ul>
                         ) : (
-                            <p className="text-center text-gray-600 dark:text-gray-400 mt-8">
-                                Belum ada pengajuan donasi yang tersedia.
-                            </p>
+                            <p className="text-center text-gray-600 dark:text-gray-400 mt-8">Belum ada pengajuan donasi yang tersedia.</p>
                         )}
                     </div>
 

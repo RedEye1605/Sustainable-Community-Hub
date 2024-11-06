@@ -6,10 +6,10 @@ export default function CreateRequestPage() {
     const { data, setData, post, processing, errors, reset } = useForm({
         title: '',
         description: '',
-        category: 'uang',
-        type: 'uang',  // Tambahkan field 'type' dengan default value
-        target_amount: '',
-        target_items: '',
+        category: '',      // Menentukan kategori (misal: Baju, Celana, dll.)
+        type: 'uang',      // Menentukan tipe donasi: uang atau barang
+        target_amount: '', // Target jumlah uang (jika type = uang)
+        target_items: '',  // Target jumlah barang (jika type = barang)
     });
 
     const handleSubmit = (e) => {
@@ -83,8 +83,23 @@ export default function CreateRequestPage() {
                     {errors.type && <p className="text-red-500 text-sm mt-1">{errors.type}</p>}
                 </div>
 
-                {/* Kondisi Berdasarkan Kategori */}
-                {data.category === 'uang' ? (
+                {/* Field Kategori */}
+                <div>
+                    <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Kategori</label>
+                    <input
+                        type="text"
+                        name="category"
+                        value={data.category}
+                        onChange={(e) => setData('category', e.target.value)}
+                        placeholder="Contoh: Baju, Celana, dll."
+                        className="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 text-gray-900 dark:text-gray-200 bg-gray-50 dark:bg-gray-700"
+                        required
+                    />
+                    {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
+                </div>
+
+                {/* Conditional Fields Based on Type */}
+                {data.type === 'uang' ? (
                     <div>
                         <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Target Pengumpulan (Rp)</label>
                         <input

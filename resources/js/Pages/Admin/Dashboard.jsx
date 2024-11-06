@@ -1,10 +1,18 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, usePage } from '@inertiajs/react';
-import React, { useEffect } from 'react';
+import { Head, Link, usePage, router } from '@inertiajs/react';
+import React from 'react';
 
 export default function Dashboard() {
     const { users = [], roles = [], pendingDonationRequests = [] } = usePage().props;
     const { csrf_token } = usePage().props;
+
+    const handleAction = (routeName, id, message) => {
+        if (confirm(message)) {
+            router.put(route(routeName, id), {}, {
+                onSuccess: () => alert(`Request ${message.toLowerCase()} successfully!`)
+            });
+        }
+    };
 
     return (
         <AuthenticatedLayout
@@ -14,57 +22,6 @@ export default function Dashboard() {
 
             <div className="py-12">
                 <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-12">
-                    
-                    {/* Donation Requests Pending Approval */}
-                    <div className="overflow-hidden bg-white shadow-lg sm:rounded-lg p-6">
-                        <h3 className="text-2xl font-bold mb-6 text-gray-700">Pending Donation Requests</h3>
-
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
-                                <thead className="bg-gray-100">
-                                    <tr>
-                                        <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Title</th>
-                                        <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Category</th>
-                                        <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Description</th>
-                                        <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {pendingDonationRequests.length > 0 ? (
-                                        pendingDonationRequests.map(request => (
-                                            <tr key={request.id} className="hover:bg-gray-50 transition duration-150 ease-in-out">
-                                                <td className="px-6 py-4 border-b">{request.title}</td>
-                                                <td className="px-6 py-4 border-b">{request.category}</td>
-                                                <td className="px-6 py-4 border-b">{request.description.substring(0, 50)}...</td>
-                                                <td className="px-6 py-4 border-b flex space-x-4">
-                                                    <Link
-                                                        href={route('admin.donation-requests.approve', request.id)}
-                                                        method="put"
-                                                        as="button"
-                                                        className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-                                                    >
-                                                        Approve
-                                                    </Link>
-                                                    <Link
-                                                        href={route('admin.donation-requests.reject', request.id)}
-                                                        method="put"
-                                                        as="button"
-                                                        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
-                                                    >
-                                                        Reject
-                                                    </Link>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan="4" className="px-6 py-4 text-center text-gray-500">No pending donation requests.</td>
-                                        </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
 
                     {/* Existing User Role Management Table */}
                     <div className="overflow-hidden bg-white shadow-lg sm:rounded-lg p-6">
@@ -151,6 +108,53 @@ export default function Dashboard() {
                                             </td>
                                         </tr>
                                     ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {/* Donation Requests Pending Approval */}
+                    <div className="overflow-hidden bg-white shadow-lg sm:rounded-lg p-6">
+                        <h3 className="text-2xl font-bold mb-6 text-gray-700">Pending Donation Requests</h3>
+
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
+                                <thead className="bg-gray-100">
+                                    <tr>
+                                        <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Title</th>
+                                        <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Category</th>
+                                        <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Description</th>
+                                        <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {pendingDonationRequests.length > 0 ? (
+                                        pendingDonationRequests.map(request => (
+                                            <tr key={request.id} className="hover:bg-gray-50 transition duration-150 ease-in-out">
+                                                <td className="px-6 py-4 border-b">{request.title}</td>
+                                                <td className="px-6 py-4 border-b">{request.category}</td>
+                                                <td className="px-6 py-4 border-b">{request.description.substring(0, 50)}...</td>
+                                                <td className="px-6 py-4 border-b flex space-x-4">
+                                                    <button
+                                                        onClick={() => handleAction('admin.donation-requests.approve', request.id, 'approve this request?')}
+                                                        className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                                                    >
+                                                        Approve
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleAction('admin.donation-requests.reject', request.id, 'reject this request?')}
+                                                        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                                                    >
+                                                        Reject
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="4" className="px-6 py-4 text-center text-gray-500">No pending donation requests.</td>
+                                        </tr>
+                                    )}
                                 </tbody>
                             </table>
                         </div>

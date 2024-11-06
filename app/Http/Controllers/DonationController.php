@@ -18,10 +18,25 @@ class DonationController extends Controller
      */
     public function index()
     {
-        $donations = Donation::all();
+        $donations = Donation::with(['donationRequest', 'user'])->get();
 
         return Inertia::render('Donations/DonationRequestsList', [
             'donations' => $donations,
+        ]);
+    }
+
+    /**
+     * Show the form for creating a new donation.
+     *
+     * @param int $donationRequestId
+     * @return \Inertia\Response
+     */
+    public function create($donationRequestId)
+    {
+        $donationRequest = DonationRequest::findOrFail($donationRequestId);
+
+        return Inertia::render('Donations/DonationFormPage', [
+            'donationRequest' => $donationRequest, // Pass the specific donation request data
         ]);
     }
 
@@ -36,6 +51,7 @@ class DonationController extends Controller
     {
         $donationRequest = DonationRequest::findOrFail($donationRequestId);
 
+        // Validation rules based on type
         $rules = [
             'type' => 'required|in:uang,barang',
         ];
@@ -49,6 +65,7 @@ class DonationController extends Controller
 
         $validatedData = $request->validate($rules);
 
+        // Prepare data for creation
         $donationData = [
             'donation_request_id' => $donationRequest->id,
             'user_id' => Auth::id(),
@@ -56,6 +73,7 @@ class DonationController extends Controller
             'status' => 'pending',
         ];
 
+        // Add additional fields based on type
         if ($validatedData['type'] === 'uang') {
             $donationData['amount'] = $validatedData['amount'];
         } else {
@@ -82,10 +100,12 @@ class DonationController extends Controller
     {
         $donation = Donation::findOrFail($id);
 
+        // Ensure only the owner can delete their donation
         if ($donation->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
         }
 
+        // Delete item image if it exists
         if ($donation->item_image && Storage::disk('public')->exists($donation->item_image)) {
             Storage::disk('public')->delete($donation->item_image);
         }

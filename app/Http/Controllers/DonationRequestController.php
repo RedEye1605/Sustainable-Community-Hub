@@ -7,12 +7,9 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class DonationRequestController extends Controller
 {
-    use AuthorizesRequests;
-
     /**
      * Display a list of donation requests pending admin approval.
      *
@@ -21,7 +18,7 @@ class DonationRequestController extends Controller
     public function adminIndex()
     {
         $donationRequests = Cache::remember('pending_donation_requests', 60, function () {
-            return DonationRequest::where('status', 'pending')->get();
+            return DonationRequest::where('status', 'pending')->with('user')->get();
         });
 
         return Inertia::render('Admin/DonationRequestsList', [
@@ -30,13 +27,13 @@ class DonationRequestController extends Controller
     }
 
     /**
-     * Display a listing of all donation requests.
+     * Display a listing of all approved donation requests.
      *
      * @return \Inertia\Response
      */
     public function index()
     {
-        $donationRequests = DonationRequest::all();
+        $donationRequests = DonationRequest::where('status', 'approved')->with('user')->get();
 
         return Inertia::render('Donations/DonationRequestList', [
             'donationRequests' => $donationRequests,
@@ -54,8 +51,6 @@ class DonationRequestController extends Controller
         $donationRequest = DonationRequest::findOrFail($id);
         
         $donationRequest->update(['status' => 'approved']);
-
-        // Clear the cache after updating status
         Cache::forget('pending_donation_requests');
 
         return redirect()->back()->with('success', 'Permintaan donasi berhasil disetujui.');
@@ -72,20 +67,19 @@ class DonationRequestController extends Controller
         $donationRequest = DonationRequest::findOrFail($id);
 
         $donationRequest->update(['status' => 'rejected']);
-
-        // Clear the cache after updating status
         Cache::forget('pending_donation_requests');
 
         return redirect()->back()->with('success', 'Permintaan donasi berhasil ditolak.');
     }
 
     /**
-     * Display dashboard for donation receivers to manage their donation requests.
+     * Display dashboard for donation receivers showing only approved requests.
      *
      * @return \Inertia\Response
      */
     public function receiverDashboard()
     {
+        // Menampilkan semua permintaan donasi yang diajukan oleh pengguna yang sedang login, tanpa memfilter status
         $donationRequests = DonationRequest::where('receiver_id', Auth::id())->get();
 
         return Inertia::render('DonaturReceiver/Dashboard', [
@@ -111,26 +105,22 @@ class DonationRequestController extends Controller
      */
     public function store(Request $request)
     {
-        // Validasi input sesuai dengan atribut yang diperlukan
         $validatedData = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
             'category' => 'required|string',
-            'type' => 'required|string|in:uang,barang', // Misalnya hanya mendukung 'uang' dan 'barang'
-            'target_amount' => 'nullable|numeric|min:1',
-            'target_items' => 'nullable|numeric|min:1',
+            'type' => 'required|string|in:uang,barang',
+            'target_amount' => 'nullable|numeric|min:1|required_if:type,uang',
+            'target_items' => 'nullable|numeric|min:1|required_if:type,barang',
         ]);
 
-        // Tambahkan data tambahan yang diperlukan untuk menyimpan permintaan donasi
         $donationRequestData = array_merge($validatedData, [
-            'receiver_id' => Auth::id(), // Menggunakan ID user yang sedang login sebagai receiver_id
-            'status' => 'pending', // Status default saat pertama kali dibuat
+            'receiver_id' => Auth::id(),
+            'status' => 'pending',
         ]);
 
-        // Simpan data ke dalam database
         DonationRequest::create($donationRequestData);
 
-        // Redirect ke dashboard receiver dengan pesan sukses
         return redirect()
             ->route('donation-receiver.dashboard')
             ->with('success', 'Permintaan donasi berhasil dibuat dan menunggu persetujuan.');
@@ -144,7 +134,6 @@ class DonationRequestController extends Controller
      */
     public function edit(DonationRequest $donationRequest)
     {
-
         return Inertia::render('Donations/EditRequestPage', [
             'donationRequest' => $donationRequest,
         ]);
@@ -172,7 +161,6 @@ class DonationRequestController extends Controller
      */
     public function update(Request $request, DonationRequest $donationRequest)
     {
-
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',

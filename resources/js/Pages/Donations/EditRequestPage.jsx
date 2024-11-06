@@ -1,12 +1,12 @@
 import React from 'react';
 import { useForm, Link } from '@inertiajs/react';
-import {route} from 'ziggy-js';
+import { route } from 'ziggy-js';
 
 export default function EditRequestPage({ donationRequest }) {
     const { data, setData, put, processing, errors } = useForm({
         title: donationRequest.title || '',
         description: donationRequest.description || '',
-        category: donationRequest.category || 'uang',
+        type: donationRequest.type || 'uang', // Use type instead of category
         target_amount: donationRequest.target_amount || '',
         target_items: donationRequest.target_items || '',
     });
@@ -58,19 +58,19 @@ export default function EditRequestPage({ donationRequest }) {
                 </div>
 
                 <div>
-                    <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Kategori</label>
+                    <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Tipe Donasi</label>
                     <select
-                        value={data.category}
-                        onChange={(e) => setData('category', e.target.value)}
+                        value={data.type}
+                        onChange={(e) => setData('type', e.target.value)}
                         className="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 text-gray-900 dark:text-gray-200 bg-gray-50 dark:bg-gray-700"
                     >
                         <option value="uang">Uang</option>
                         <option value="barang">Barang</option>
                     </select>
-                    {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
+                    {errors.type && <p className="text-red-500 text-sm mt-1">{errors.type}</p>}
                 </div>
 
-                {data.category === 'uang' ? (
+                {data.type === 'uang' ? (
                     <div>
                         <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Target Pengumpulan (Rp)</label>
                         <input
