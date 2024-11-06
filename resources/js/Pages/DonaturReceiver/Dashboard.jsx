@@ -24,7 +24,7 @@ export default function DashboardDonationReceiverPage() {
     };
 
     // Filter requests based on status
-    const filteredRequests = donationRequests.filter((request) => 
+    const filteredRequests = donationRequests.filter((request) =>
         statusFilter === 'all' || request.status === statusFilter
     );
 
@@ -71,10 +71,10 @@ export default function DashboardDonationReceiverPage() {
                             <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
                                 <thead className="bg-gray-100">
                                     <tr>
-                                        <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Title</th>
+                                        <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Judul</th>
                                         <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Progress</th>
                                         <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Status</th>
-                                        <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Actions</th>
+                                        <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -86,7 +86,7 @@ export default function DashboardDonationReceiverPage() {
                                                     {request.type === 'uang' ? (
                                                         <p>Rp {request.collected_amount} / Rp {request.target_amount}</p>
                                                     ) : (
-                                                        <p>{request.collected_items} Barang / {request.target_items} Barang</p>
+                                                        <p>{request.collected_amount} Barang / {request.target_items} Barang</p>
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4 border-b">
@@ -105,14 +105,12 @@ export default function DashboardDonationReceiverPage() {
                                                     >
                                                         Lihat
                                                     </Link>
-                                                    {request.status === 'pending' && (
-                                                        <Link
-                                                            href={route('donation-requests.edit', request.id)}
-                                                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-150 ease-in-out"
-                                                        >
-                                                            Edit
-                                                        </Link>
-                                                    )}
+                                                    <Link
+                                                        href={route('donation-requests.edit', request.id)}
+                                                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-150 ease-in-out"
+                                                    >
+                                                        Edit
+                                                    </Link>
                                                     <button
                                                         onClick={() => handleDelete(request.id)}
                                                         className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-150 ease-in-out"

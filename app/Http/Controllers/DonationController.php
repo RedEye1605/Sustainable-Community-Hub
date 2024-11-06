@@ -11,6 +11,46 @@ use Illuminate\Support\Facades\Storage;
 
 class DonationController extends Controller
 {
+
+    /**
+     * Display the details of a donation request with all related donations.
+     * Menampilkan detail dari permintaan donasi bersama dengan daftar donatur.
+     *
+     * @param int $donationRequestId
+     * @return \Inertia\Response
+     */
+    public function myDonations()
+    {
+        $userId = Auth::id();
+        $donations = Donation::where('user_id', $userId)
+            ->with('donationRequest')
+            ->orderBy('created_at', 'desc')
+            ->get();
+    
+        return Inertia::render('UserDashboard', [
+            'donations' => $donations,
+        ]);
+    }    
+    
+    /**
+     * Display a listing of donations for the authenticated user.
+     *
+     * @return \Inertia\Response
+     */
+    public function userDonations()
+    {
+        $userId = Auth::id(); // Ambil ID pengguna yang sedang login
+
+        // Ambil donasi dengan user_id sesuai pengguna login
+        $donationRequests = Donation::where('user_id', $userId)
+            ->with('donationRequest') // Memastikan relasi donationRequest dimuat
+            ->get();
+
+        return Inertia::render('DashboardDonationReceiverPage', [
+            'donationRequests' => $donationRequests,
+        ]);
+    }
+
     /**
      * Display a listing of donations.
      *
@@ -36,7 +76,7 @@ class DonationController extends Controller
         $donationRequest = DonationRequest::findOrFail($donationRequestId);
 
         return Inertia::render('Donations/DonationFormPage', [
-            'donationRequest' => $donationRequest, // Pass the specific donation request data
+            'donationRequest' => $donationRequest,
         ]);
     }
 
@@ -65,12 +105,12 @@ class DonationController extends Controller
 
         $validatedData = $request->validate($rules);
 
-        // Prepare data for creation
+        // Prepare data for creation with default status as 'approved'
         $donationData = [
             'donation_request_id' => $donationRequest->id,
             'user_id' => Auth::id(),
             'type' => $validatedData['type'],
-            'status' => 'pending',
+            'status' => 'approved', // Set status to 'approved' by default
         ];
 
         // Add additional fields based on type
@@ -83,11 +123,19 @@ class DonationController extends Controller
             }
         }
 
-        Donation::create($donationData);
+        // Save the donation
+        $donation = Donation::create($donationData);
+
+        // Update collected amount in DonationRequest immediately without approval check
+        if ($validatedData['type'] === 'uang') {
+            $donationRequest->increment('collected_amount', $validatedData['amount']);
+        } else {
+            $donationRequest->increment('collected_amount', 1); // Increment by 1 for each item donated
+        }
 
         return redirect()
             ->route('donation-requests.show', ['donation_request' => $donationRequestId])
-            ->with('success', 'Donasi Anda berhasil disimpan dan menunggu persetujuan.');
+            ->with('success', 'Donasi Anda berhasil disimpan.');
     }
 
     /**
@@ -103,6 +151,14 @@ class DonationController extends Controller
         // Ensure only the owner can delete their donation
         if ($donation->user_id !== Auth::id()) {
             abort(403, 'Unauthorized action.');
+        }
+
+        // Adjust collected amount on deletion
+        $donationRequest = $donation->donationRequest;
+        if ($donation->type === 'uang' && $donation->amount) {
+            $donationRequest->decrement('collected_amount', $donation->amount);
+        } elseif ($donation->type === 'barang') {
+            $donationRequest->decrement('collected_amount', 1);
         }
 
         // Delete item image if it exists

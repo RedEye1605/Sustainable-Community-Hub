@@ -29,6 +29,8 @@ Route::get('/', function () {
 // Authenticated User Dashboard Routes (requires auth and email verification)
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [ProjectController::class, 'userDashboard'])->name('dashboard');
+
+    Route::get('/UserDashboard', [DonationController::class, 'myDonations'])->name('donations.myDonations');
     
     // User Donation Routes
     Route::prefix('donations')->name('donations.')->group(function () {

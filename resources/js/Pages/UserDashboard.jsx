@@ -25,6 +25,7 @@ export default function Dashboard() {
     const filteredDonations = donations.filter((donation) => 
         statusFilter === 'all' || donation.status === statusFilter
     );
+    console.log("Received donations:", donations);
 
     return (
         <AuthenticatedLayout

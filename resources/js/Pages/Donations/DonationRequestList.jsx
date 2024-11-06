@@ -241,9 +241,9 @@ const DonationRequestList = () => {
                                             {request.title[0]}
                                         </div>
                                         <div className="flex-grow">
-                                            <Link href={route('donation-requests.show', request.id)} className="text-2xl font-bold text-gray-800 dark:text-white hover:text-[#FF2D20]">
-                                                {request.title}
-                                            </Link>
+                                        <Link href={route('donation-requests.show', { donation_request: request.id })} className="text-2xl font-bold text-gray-800 dark:text-white hover:text-[#FF2D20]">
+                                            {request.title}
+                                        </Link>
                                             <p className="text-gray-600 dark:text-gray-400 mt-2">
                                                 {truncateText(request.description, 100)}
                                             </p>

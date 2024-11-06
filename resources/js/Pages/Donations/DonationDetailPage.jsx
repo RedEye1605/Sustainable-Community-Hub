@@ -3,14 +3,15 @@ import { usePage, Link } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 
 export default function DonationDetailPage() {
-    const { donationRequest, donations = [], auth } = usePage().props;
+    // Pastikan donations termasuk dalam destructuring props
+    const { donationRequest, donations = [] } = usePage().props;
 
-    // Calculate total collected based on donation type
-    const totalCollected = donations.reduce((total, donation) => {
-        return total + (donationRequest.type === 'uang' ? donation.amount : 1);
-    }, 0);
+    // Log data to console for debugging
+    console.log('donationRequest:', donationRequest);
+    console.log('donations:', donations); // Pastikan ini menampilkan array dengan user data
 
-    // Calculate progress percentage
+    // Total terkumpul dan persentase progres
+    const totalCollected = donationRequest.collected_amount;
     const target = donationRequest.type === 'uang' ? donationRequest.target_amount : donationRequest.target_items;
     const progressPercentage = Math.min((totalCollected / target) * 100, 100).toFixed(2);
 
@@ -32,7 +33,6 @@ export default function DonationDetailPage() {
 
             {/* Donation Request Details */}
             <div className="w-full max-w-3xl bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg space-y-6">
-                {/* Description */}
                 <p className="text-gray-700 dark:text-gray-300 leading-relaxed">{donationRequest.description}</p>
 
                 {/* Tags for Category and Target */}
@@ -70,23 +70,28 @@ export default function DonationDetailPage() {
                     <h3 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Daftar Donatur</h3>
                     {donations.length > 0 ? (
                         <ul className="space-y-4">
-                            {donations.map((donation, index) => (
-                                <li key={index} className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md">
-                                    <div className="flex justify-between">
+                            {donations.map((donation) => (
+                                <li key={donation.id} className="p-4 bg-gray-100 dark:bg-gray-700 rounded-lg shadow-md">
+                                    <div className="flex flex-col md:flex-row justify-between">
+                                        {/* Donor Information */}
                                         <div>
                                             <p className="text-gray-800 dark:text-gray-200 font-semibold">
-                                                {donation.user.name}
+                                                {donation.user?.name || 'Anonymous'}
                                             </p>
                                             <p className="text-sm text-gray-600 dark:text-gray-400">
-                                                {donation.type === 'uang' ? `Donasi Uang: Rp ${donation.amount}` : `Donasi Barang: ${donation.item_description}`}
+                                                {donation.type === 'uang' 
+                                                    ? `Donasi Uang: Rp ${donation.amount}` 
+                                                    : `Donasi Barang: ${donation.item_description}`
+                                                }
                                             </p>
                                         </div>
+                                        {/* Status Label */}
                                         <span className={`px-2 py-1 text-xs font-semibold rounded-lg ${
-                                            donation.status === 'approved' ? 'bg-green-100 text-green-800' :
-                                            donation.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                            'bg-red-100 text-red-800'
-                                        }`}>
-                                            {donation.status.charAt(0).toUpperCase() + donation.status.slice(1)}
+                                            donation.status === 'approved' 
+                                                ? 'bg-green-100 text-green-800' 
+                                                : 'bg-yellow-100 text-yellow-800'
+                                        } mt-2 md:mt-0`}>
+                                            {donation.status === 'approved' ? 'Approved' : 'Pending'}
                                         </span>
                                     </div>
                                 </li>

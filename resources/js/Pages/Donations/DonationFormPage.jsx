@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useForm, Link } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 
 export default function DonationFormPage({ donationRequest }) {
     const isMoneyDonation = donationRequest.type === 'uang';
-    const targetAmount = donationRequest.target_amount || 0;
+    const targetAmount = donationRequest.type === 'uang' ? donationRequest.target_amount : donationRequest.target_items;
 
     const { data, setData, post, processing, errors } = useForm({
         amount: '',
@@ -14,10 +14,10 @@ export default function DonationFormPage({ donationRequest }) {
     });
 
     const [preview, setPreview] = useState(null);
-    const [collectedAmount, setCollectedAmount] = useState(donationRequest.collected_amount || 0); // Initial collected amount from server
+    const [collectedAmount, setCollectedAmount] = useState(donationRequest.collected_amount || 0); // Start from current collected_amount
 
     // Calculate donation progress percentage
-    const donationProgress = Math.min((collectedAmount / targetAmount) * 100, 100);
+    const donationProgress = Math.min((collectedAmount / targetAmount) * 100, 100).toFixed(2);
 
     // Handle form input changes
     const handleInputChange = (e) => {
@@ -56,7 +56,9 @@ export default function DonationFormPage({ donationRequest }) {
                 onSuccess: () => {
                     alert('Donasi berhasil dikirim!');
                     if (isMoneyDonation) {
-                        setCollectedAmount((prev) => prev + parseFloat(data.amount)); // Update collected amount
+                        setCollectedAmount((prev) => prev + parseFloat(data.amount)); // Update collected amount for money
+                    } else {
+                        setCollectedAmount((prev) => prev + 1); // Update collected amount for item donations
                     }
                     setData({
                         amount: '',
@@ -101,7 +103,7 @@ export default function DonationFormPage({ donationRequest }) {
                 ></div>
             </div>
             <p className="text-gray-700 dark:text-gray-300 mb-6">
-                Total Terkumpul: Rp {collectedAmount} dari Rp {targetAmount} ({donationProgress.toFixed(2)}%)
+                Total Terkumpul: {isMoneyDonation ? `Rp ${collectedAmount}` : `${collectedAmount} Barang`} dari {isMoneyDonation ? `Rp ${targetAmount}` : `${targetAmount} Barang`} ({donationProgress}%)
             </p>
 
             <form onSubmit={handleSubmit} className="max-w-3xl w-full bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg space-y-6">
