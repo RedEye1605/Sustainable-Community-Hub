@@ -1,18 +1,14 @@
 import React, { useState } from 'react';
-import { Head, Link, usePage } from '@inertiajs/react';
-import Modal from '../Components/Modal';
-import ConfirmPassword from './Auth/ConfirmPassword';
-import ForgotPassword from './Auth/ForgotPassword';
-import Login from './Auth/Login';
-import Register from './Auth/Register';
-import ResetPassword from './Auth/ResetPassword';
-import VerifyEmail from './Auth/VerifyEmail';
-import HeroCarousel from '../Components/HeroCarousel';
-import DonationBanner from '../Components/DonationBanner';
-import SectionSeparator from '@/Components/SectionSeperator';
-import Testimonial from '@/Components/Testimonial';
+import { Link, Head, usePage } from '@inertiajs/react';
 import { Transition } from '@headlessui/react';
-import '../../css/app.css';
+import Modal from '../../Components/Modal';
+import ConfirmPassword from '../Auth/ConfirmPassword';
+import ForgotPassword from '../Auth/ForgotPassword';
+import Login from '../Auth/Login';
+import Register from '../Auth/Register';
+import ResetPassword from '../Auth/ResetPassword';
+import VerifyEmail from '../Auth/VerifyEmail';
+import { route } from 'ziggy-js';
 
 // Reusable components
 const NavLink = ({ href, children }) => (
@@ -30,32 +26,18 @@ const SectionHeader = ({ title }) => (
     </h2>
 );
 
-const Card = ({ href, imageSrc, imageAlt, title, description, children }) => (
-    <a
-        href={href}
-        className="flex flex-col items-start gap-4 overflow-hidden rounded-lg bg-white dark:bg-gray-800 p-6 shadow-lg ring-1 ring-gray-200 dark:ring-gray-700 transition duration-300 hover:shadow-xl hover:ring-gray-400 dark:hover:ring-gray-500"
-    >
-        <div className="relative w-full flex items-stretch">
-            <img
-                src={imageSrc}
-                alt={imageAlt}
-                className="aspect-video w-full rounded-md object-cover shadow-md"
-                onError={(e) => (e.currentTarget.style.display = 'none')}
-            />
-        </div>
-        <div className="relative flex flex-col gap-4">
-            <SectionHeader title={title} />
-            <p className="text-sm text-gray-700 dark:text-gray-300">
-                {description}
-            </p>
-            <div className="mt-4">
-                {children}
-            </div>
-        </div>
-    </a>
-);
+// Function to truncate description text by character count
+const truncateText = (text, charLimit) => {
+    if (text.length > charLimit) {
+        return text.slice(0, charLimit) + '...';
+    }
+    return text;
+};
 
-export default function Welcome({ auth, laravelVersion, phpVersion }) {   
+const DonationRequestList = () => {
+    const { donationRequests = [], auth } = usePage().props;
+
+    // State untuk menangani buka dan tutup modal
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [isRegisterOpen, setIsRegisterOpen] = useState(false);
     const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
@@ -66,14 +48,14 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
     // Fungsi untuk membuka modal Forgot Password dari Login
     const openForgotPasswordModal = () => {
-        setIsLoginOpen(false);  // Tutup modal Login
-        setIsForgotPasswordOpen(true);  // Buka modal Forgot Password
+        setIsLoginOpen(false);  
+        setIsForgotPasswordOpen(true);  
     };
 
     // Fungsi untuk membuka modal Login dari Register
     const openLoginFromRegister = () => {
-        setIsRegisterOpen(false);  // Tutup modal Register
-        setIsLoginOpen(true);      // Buka modal Login
+        setIsRegisterOpen(false);  
+        setIsLoginOpen(true);   
     };
 
     // Handler untuk membuka modal Confirm Password
@@ -81,14 +63,10 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
         setIsConfirmPasswordOpen(true);
     };
 
-    //Carousel
-    const slides = [
-        { image: '/storage/images/Carousel/pexels-thirdman-7656742.jpg', title: 'Selamat Datang di Komunitas Hijau', description: 'Mari bersama menjaga lingkungan!' },
-        { image: '/storage/images/Carousel/pexels-ron-lach-9037596.jpg', title: 'Bersihkan Pantai Bersama', description: 'Aksi nyata untuk laut yang lebih bersih.' },
-        { image: '/storage/images/Carousel/pexels-walter-cordero-682282228-25961210.jpg', title: 'Tanam Pohon untuk Masa Depan', description: 'Satu pohon untuk kehidupan yang lebih baik.' },
-        { image: '/storage/images/Carousel/pexels-katerina-holmes-5905918.jpg', title: 'Edukasi Generasi Muda', description: 'Membangun kesadaran lingkungan sejak dini.' },
-        { image: '/storage/images/Carousel/pexels-julia-m-cameron-6994992.jpg', title: 'Donasi untuk Masa Depan Hijau', description: 'Setiap donasi membantu membuat perubahan nyata.' },
-    ];
+    const openVerifyEmailModal = () => {
+        setIsRegisterOpen(false);
+        setIsVerifyEmailOpen(true);
+    };
 
     return (
         <>
@@ -117,25 +95,25 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                     {/* Navigation Links (Visible on Desktop) */}
                     <nav className="hidden md:flex flex-grow justify-center space-x-6 text-gray-700 dark:text-gray-300">
-                        <a href="#" className="text-[#FF2D20] font-semibold border-b-2 border-[#FF2D20] hover:border-[#e0241c] transition duration-200">
+                        <a href={route('home')} className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">
                             Home
                         </a>
-                        <a href={route('projects.index')} className="hover:text-[#FF2D20] transition-colors duration-200">
+                        <a href={route('projects.index')} className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">
                             Event
                         </a>
-                        <a href={route('donation-requests.index')} className="hover:text-[#FF2D20] transition-colors duration-200">
+                        <a href="#" className="text-[#FF2D20] font-semibold border-b-2 border-[#FF2D20] hover:border-[#e0241c] transition duration-300">
                             Donasi
                         </a>
-                        <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">
+                        <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">
                             Forum Diskusi
                         </a>
-                        <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">
+                        <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">
                             Artikel
                         </a>
-                        <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">
+                        <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">
                             Peta
                         </a>
-                        <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">
+                        <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">
                             Kalender
                         </a>
                     </nav>
@@ -190,7 +168,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                                 </button>
                             </>
                         )}
-                    </div>  
+                    </div>
                 </div>
 
                 {/* Mobile Menu (Only Visible When isMenuOpen is True) */}
@@ -205,13 +183,13 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     className="md:hidden"
                 >
                     <nav className="flex flex-col space-y-4 p-6 bg-gray-800 text-white rounded-lg shadow-lg">
-                        <a href="#" className="text-[#FF2D20] font-semibold border-b-2 border-[#FF2D20] hover:border-[#e0241c] transition duration-300">Home</a>
-                        <a href={route('projects.index')} className="hover:text-[#FF2D20] transition-colors duration-200">Event</a>
-                        <a href={route('donation-requests.index')} className="hover:text-[#FF2D20] transition-colors duration-200">Donasi</a>
-                        <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">Forum Diskusi</a>
-                        <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">Artikel</a>
-                        <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">Peta</a>
-                        <a href="#" className="hover:text-[#FF2D20] transition-colors duration-200">Kalender</a>
+                        <a href={route('home')} className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">Home</a>
+                        <a href={route('projects.index')} className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">Event</a>
+                        <a href="#" className="text-[#FF2D20] font-semibold border-b-2 border-[#FF2D20] hover:border-[#e0241c] transition duration-300">Donasi</a>
+                        <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">Forum Diskusi</a>
+                        <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">Artikel</a>
+                        <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">Peta</a>
+                        <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">Kalender</a>
                         
                         {/* Authentication Links for Mobile */}
                         <div className="mt-6 flex flex-col space-y-2 border-t border-gray-600 pt-4">
@@ -250,31 +228,80 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                 </Transition>
             </header>
 
-                <main>
+                {/* Main Content */}
+                <main className="flex-grow p-6 lg:p-12 flex flex-col items-center">
+                    <h1 className="text-4xl font-extrabold text-gray-800 dark:text-white mb-8 text-center">
+                        Daftar Pengajuan Donasi
+                    </h1>
+
+                    <div className="w-full max-w-4xl">
+                        {donationRequests.length > 0 ? (
+                            <ul className="space-y-6">
+                                {donationRequests.map((request) => (
+                                    <li key={request.id} className="flex items-start gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-shadow duration-200">
+                                        <div className="flex-shrink-0 w-16 h-16 bg-blue-100 dark:bg-blue-700 text-blue-800 dark:text-blue-200 rounded-full flex items-center justify-center font-bold text-lg">
+                                            {request.title[0]}
+                                        </div>
+                                        <div className="flex-grow">
+                                            <Link href={route('donation-requests.show', request.id)} className="text-2xl font-bold text-gray-800 dark:text-white hover:text-[#FF2D20]">
+                                                {request.title}
+                                            </Link>
+                                            <p className="text-gray-600 dark:text-gray-400 mt-2">
+                                                {request.description.length > 100 ? request.description.substring(0, 100) + '...' : request.description}
+                                            </p>
+                                            <span className="inline-block px-2 py-1 mt-4 text-sm font-semibold bg-green-100 dark:bg-green-700 text-green-800 dark:text-green-200 rounded">
+                                                Kategori: {request.category === 'uang' ? 'Uang' : 'Barang'}
+                                            </span>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        ) : (
+                            <p className="text-center text-gray-600 dark:text-gray-400 mt-8">
+                                Belum ada pengajuan donasi yang tersedia.
+                            </p>
+                        )}
+                    </div>
+
                     {/* Login Modal */}
                     <Modal show={isLoginOpen} onClose={() => setIsLoginOpen(false)} maxWidth="md">
                         <div className="p-4">
-                            <Login canResetPassword={true} onForgotPasswordClick={openForgotPasswordModal} />
+                            <Login 
+                                canResetPassword={true} 
+                                onForgotPasswordClick={() => {
+                                    setIsLoginOpen(false);
+                                    setIsForgotPasswordOpen(true);
+                                }} 
+                            />
                         </div>
                     </Modal>
 
                     {/* Register Modal */}
                     <Modal show={isRegisterOpen} onClose={() => setIsRegisterOpen(false)} maxWidth="md">
                         <div className="p-4">
-                            <Register onLoginClick={() => { setIsRegisterOpen(false); setIsLoginOpen(true); }} />
+                            <Register 
+                                onLoginClick={() => {
+                                    setIsRegisterOpen(false); 
+                                    setIsLoginOpen(true);
+                                }}
+                                onVerifyEmailClick={() => {
+                                    setIsRegisterOpen(false); 
+                                    setIsVerifyEmailOpen(true);
+                                }}
+                            />
                         </div>
                     </Modal>
 
                     {/* Forgot Password Modal */}
                     <Modal show={isForgotPasswordOpen} onClose={() => setIsForgotPasswordOpen(false)} maxWidth="md">
-                        <div className="p-4">
-                            <ForgotPassword 
-                                onResetPasswordRequested={() => {
-                                    setIsForgotPasswordOpen(false);  // Tutup modal ForgotPassword
-                                    setIsResetPasswordOpen(true);    // Buka modal ResetPassword
-                                }} 
-                            />
-                        </div>
+                    <div className="p-4">
+                        <ForgotPassword 
+                            onResetPasswordRequested={() => {
+                                setIsForgotPasswordOpen(false);
+                                setIsResetPasswordOpen(true);
+                            }} 
+                        />
+                    </div>
                     </Modal>
 
                     {/* Confirm Password Modal */}
@@ -297,139 +324,9 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                             <VerifyEmail />
                         </div>
                     </Modal>
-
-                    {/* Hero Section */}
-                    <HeroCarousel slides={slides} searchPlaceholder="Cari inisiatif hijau di dekat Anda" />
-
-                    <SectionSeparator text="Aksi Nyata untuk Masa Depan yang Lebih Hijau" />
-
-                    {/* Impact Section */}
-                    <section className="impact-section py-16 text-center bg-gray-50 dark:bg-gray-900">
-                        <h2 className="text-4xl font-extrabold mb-8 text-gray-800 dark:text-white">
-                            Dampak Positif yang Telah Kita Ciptakan
-                        </h2>
-                        <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
-                            {/* Individual impact cards with hover effect */}
-                            {[
-                                { count: "10,000+", label: "Pohon Ditanam" },
-                                { count: "500+", label: "Kilogram Sampah Dikumpulkan" },
-                                { count: "300+", label: "Relawan Terlibat" },
-                                { count: "20+", label: "Kegiatan Dijalankan" },
-                            ].map((impact, index) => (
-                                <div key={index} className="hover:scale-105 transition-transform duration-300">
-                                    <h3 className="text-3xl font-semibold text-green-600 dark:text-green-300">{impact.count}</h3>
-                                    <p className="text-lg text-gray-700 dark:text-gray-400">{impact.label}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-
-                    <SectionSeparator />
-
-                    {/* Testimonials Section */}
-                    <Testimonial />
-
-                    <SectionSeparator />
-
-                    {/* How to Help Section */}
-                    <section className="how-to-help py-16 text-center bg-gray-50 dark:bg-gray-900">
-                        <h2 className="text-4xl font-extrabold mb-8 text-gray-800 dark:text-white">Bagaimana Anda Bisa Membantu</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-                            {/* Help options with animated hover effect */}
-                            {[
-                                { title: "Donasi", description: "Dukung proyek kami dengan berdonasi untuk keberlanjutan lingkungan." },
-                                { title: "Jadi Relawan", description: "Bergabung dengan komunitas untuk aksi nyata di lapangan." },
-                                { title: "Bagikan", description: "Sebarkan informasi tentang misi kami kepada teman-teman Anda." },
-                            ].map((help, index) => (
-                                <div
-                                    key={index}
-                                    className="p-6 bg-white dark:bg-gray-800 shadow-lg rounded-lg transform transition hover:scale-105 hover:shadow-xl duration-300"
-                                >
-                                    <h3 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2">{help.title}</h3>
-                                    <p className="text-gray-600 dark:text-gray-400">{help.description}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </section>
-
-                    {/* Donation Banner */}
-                    <DonationBanner />
-
-                    {/* Information Cards Section */}
-                    <section className="information-cards grid grid-cols-1 gap-8 py-12 px-6 lg:grid-cols-2">
-                        <Card
-                            href="#"
-                            imageSrc="map.jpg"
-                            imageAlt="Green Initiative Map"
-                            title="Peta Lokasi Inisiatif Hijau"
-                            description="Temukan lokasi inisiatif hijau di daerah Anda."
-                        >
-                            <button className="px-4 py-2 bg-[#FF2D20] text-white rounded-lg hover:bg-[#e0241c]">Lihat Detail</button>
-                        </Card>
-                        <Card
-                            href="#"
-                            imageSrc="calendar.jpg"
-                            imageAlt="Event Calendar"
-                            title="Kalender Kegiatan"
-                            description="Jadwal kegiatan komunitas untuk lingkungan berkelanjutan."
-                        >
-                            <button className="px-4 py-2 bg-[#FF2D20] text-white rounded-lg hover:bg-[#e0241c]">Lihat Detail</button>
-                        </Card>
-                    </section>
-
-                    {/* Upcoming Events Section */}
-                    <section className="upcoming-events py-12 px-6">
-                        <SectionHeader title="Event Terdekat" />
-                        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                            <Card
-                                href="#"
-                                imageSrc="beach-cleanup.jpg"
-                                imageAlt="Beach Cleanup"
-                                title="Bersih Bersih Pantai Balekambang"
-                                description="01 Januari 2025"
-                            >
-                                <button className="px-4 py-2 bg-[#FF2D20] text-white rounded-lg hover:bg-[#e0241c]">Lihat Detail</button>
-                            </Card>
-                            <Card
-                                href="#"
-                                imageSrc="beach-cleanup.jpg"
-                                imageAlt="Beach Cleanup"
-                                title="Bersih Bersih Pantai Balekambang"
-                                description="01 Januari 2025"
-                            >
-                                <button className="px-4 py-2 bg-[#FF2D20] text-white rounded-lg hover:bg-[#e0241c]">Lihat Detail</button>
-                            </Card>
-                        </div>
-                    </section>
-
-                    {/* News and Articles Section */}
-                    <section className="news-articles py-12 px-6">
-                        <SectionHeader title="Berita dan Artikel" />
-                        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                            <Card
-                                href="#"
-                                imageSrc="teen-volunteers.jpg"
-                                imageAlt="Teen Volunteers"
-                                title="Sekelompok Remaja Bantu Atasi Kelaparan Suku di Papua"
-                                description="Baca kisah inspiratif ini"
-                            >
-                                <button className="px-4 py-2 bg-[#FF2D20] text-white rounded-lg hover:bg-[#e0241c]">Baca</button>
-                            </Card>
-                            <Card
-                                href="#"
-                                imageSrc="teen-volunteers.jpg"
-                                imageAlt="Teen Volunteers"
-                                title="Sekelompok Remaja Bantu Atasi Kelaparan Suku di Papua"
-                                description="Baca kisah inspiratif ini"
-                            >
-                                <button className="px-4 py-2 bg-[#FF2D20] text-white rounded-lg hover:bg-[#e0241c]">Baca</button>
-                            </Card>
-                        </div>
-                    </section>
                 </main>
 
                 <footer className="footer py-12 px-6 bg-gray-800 text-gray-300 flex flex-col md:flex-row justify-between items-center space-y-8 md:space-y-0">
-                    {/* Left Section - Information */}
                     <div className="footer-info text-center md:text-left">
                         <h2 className="text-2xl font-bold text-white">Sustainable Community</h2>
                         <p className="mt-2 text-sm">Komunitas Perubahan Sejak 2024</p>
@@ -474,4 +371,6 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
             </div>
         </>
     );
-}
+};
+
+export default DonationRequestList;

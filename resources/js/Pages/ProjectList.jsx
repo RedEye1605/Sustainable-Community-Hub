@@ -128,7 +128,7 @@ const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
                         <a href="#" className="text-[#FF2D20] font-semibold border-b-2 border-[#FF2D20] hover:border-[#e0241c] transition duration-300">
                             Event
                         </a>
-                        <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">
+                        <a href={route('donation-requests.index')} className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">
                             Donasi
                         </a>
                         <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">
@@ -163,9 +163,9 @@ const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
                                     >
                                         Dashboard
                                     </Link>
-                                ) : auth.user.roles.some(role => role.name === 'receiver') ? (
+                                ) : auth.user.roles.some(role => role.name === 'donatur receiver') ? (
                                     <Link
-                                        href={route('receiver.dashboard')}
+                                        href={route('donation-receiver.dashboard')}
                                         className="text-gray-800 dark:text-white hover:text-[#FF2D20] font-semibold transition-colors duration-300"
                                     >
                                         Dashboard
@@ -212,7 +212,7 @@ const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
                     <nav className="flex flex-col space-y-4 p-6 bg-gray-800 text-white rounded-lg shadow-lg">
                         <a href={route('home')} className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">Home</a>
                         <a href="#" className="text-[#FF2D20] font-semibold border-b-2 border-[#FF2D20] hover:border-[#e0241c] transition duration-300">Event</a>
-                        <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">Donasi</a>
+                        <a href={route('donation-requests.index')} className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">Donasi</a>
                         <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">Forum Diskusi</a>
                         <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">Artikel</a>
                         <a href="#" className="hover:text-[#FF2D20] font-semibold transition-colors duration-300">Peta</a>
@@ -230,8 +230,8 @@ const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
                                         <Link href={route('project-manager.dashboard')} className="hover:text-[#FF2D20]">
                                             Dashboard
                                         </Link>
-                                    ) : auth.user.roles.some(role => role.name === 'receiver') ? (
-                                        <Link href={route('receiver.dashboard')} className="hover:text-[#FF2D20]">
+                                    ) : auth.user.roles.some(role => role.name === 'donatur receiver') ? (
+                                        <Link href={route('donation-receiver.dashboard')} className="hover:text-[#FF2D20]">
                                             Dashboard
                                         </Link>
                                     ) : (

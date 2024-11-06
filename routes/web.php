@@ -3,15 +3,20 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\AdminController;
-use Illuminate\Foundation\Application;
 use App\Http\Controllers\VolunteerController;
+use App\Http\Controllers\DonationController;
+use App\Http\Controllers\DonationRequestController;
+use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Rute publik untuk melihat daftar proyek dan detail proyek tanpa login
-Route::resource('projects', ProjectController::class)->only(['index', 'show']);
+// Public Routes for viewing projects and donation requests without login
+Route::get('projects', [ProjectController::class, 'index'])->name('projects.index');
+Route::get('projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
+Route::get('donation-requests', [DonationRequestController::class, 'index'])->name('donation-requests.index');
+Route::get('/donation-requests/{donation_request}', [DonationRequestController::class, 'show'])->name('donation-requests.show');
 
-// Rute untuk Welcome Page
+// Welcome Page Route
 Route::get('/', function () {
     return Inertia::render('Welcome', [
         'canLogin' => Route::has('login'),
@@ -21,28 +26,51 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
-// Rute Dashboard untuk Pengguna Biasa (memerlukan autentikasi dan verifikasi email)
-Route::middleware(['auth', 'verified'])->get('/dashboard', [ProjectController::class, 'userDashboard'])->name('dashboard');
+// Authenticated User Dashboard Routes (requires auth and email verification)
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/dashboard', [ProjectController::class, 'userDashboard'])->name('dashboard');
+    
+    // Routes for donations
+    Route::post('/donations/{donationRequestId}/store', [DonationController::class, 'store'])->name('donations.store');
+    Route::delete('/donations/{id}', [DonationController::class, 'destroy'])->name('donations.destroy');
+});
 
-// Rute untuk Admin (akses penuh ke semua action kecuali `index` dan `show`)
+// Admin Routes for full access, excluding index and show actions
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::post('/assign-role', [AdminController::class, 'assignRole'])->name('admin.assign-role');
     Route::post('/unassign-role', [AdminController::class, 'unassignRole'])->name('admin.unassign-role');
+    
+    // Admin-specific donation request management routes
+    Route::get('/donation-requests', [DonationRequestController::class, 'adminIndex'])->name('admin.donation-requests.index');
+    Route::put('/donation-requests/{id}/approve', [DonationRequestController::class, 'approve'])->name('admin.donation-requests.approve');
+    Route::put('/donation-requests/{id}/reject', [DonationRequestController::class, 'reject'])->name('admin.donation-requests.reject');
 });
 
-// Rute untuk Pengelola Proyek (akses terbatas ke tindakan proyek mereka sendiri)
+// Project Manager Routes for managing their own projects
 Route::middleware(['auth', 'role:pengelola proyek'])->prefix('project-manager')->group(function () {
     Route::get('/dashboard', [ProjectController::class, 'dashboard'])->name('project-manager.dashboard');
 });
 
-// Rute untuk Manajemen Profil (akses login diperlukan)
+// Donation Receiver Routes for managing donation requests (requires auth and 'donation_receiver' role)
+Route::middleware(['auth', 'role:donatur receiver'])->group(function () {
+    Route::get('/donaturReceiver/dashboard', [DonationRequestController::class, 'receiverDashboard'])->name('donation-receiver.dashboard');
+    
+    // Donation request creation, editing, and deletion routes
+    Route::post('/donation-requests', [DonationRequestController::class, 'store'])->name('donation-requests.store');
+    Route::get('/donation-requests/{donation_request}/edit', [DonationRequestController::class, 'edit'])->name('donation-requests.edit');
+    Route::put('/donation-requests/{donation_request}', [DonationRequestController::class, 'update'])->name('donation-requests.update');
+    Route::delete('/donation-requests/{donation_request}', [DonationRequestController::class, 'destroy'])->name('donation-requests.destroy');
+    Route::get('/Donations/CreateRequestPage', [DonationRequestController::class, 'create'])->name('donation-requests.create');
+});
+
+// Profile Management Routes (requires authentication)
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Rute untuk Manajemen Proyek (akses login diperlukan)
+    // Project management routes (for users with access)
     Route::get('/Proyek/CreateProjectPage', [ProjectController::class, 'create'])->name('projects.create');
     Route::post('projects', [ProjectController::class, 'store'])->name('projects.store');
     Route::get('/Proyek/{project}/ProjectEdit', [ProjectController::class, 'edit'])->name('projects.edit');
@@ -53,5 +81,5 @@ Route::middleware('auth')->group(function () {
     Route::post('/projects/{projectId}/unfollow', [VolunteerController::class, 'unfollowProject'])->name('projects.unfollow');
 });
 
-// Autentikasi standar Laravel
+// Standard Laravel Authentication Routes
 require __DIR__.'/auth.php';

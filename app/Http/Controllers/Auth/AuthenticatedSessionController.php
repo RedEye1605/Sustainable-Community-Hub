@@ -49,8 +49,9 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended(route('admin.dashboard'));
         } elseif ($user && $user->hasRole('pengelola proyek')) {
             return redirect()->intended(route('project-manager.dashboard'));
+        } elseif ($user && $user->hasRole('donatur receiver')) {
+            return redirect()->intended(route('donation-receiver.dashboard'));
         } else {
-            // Mengarahkan pengguna lain ke dashboard atau halaman lain yang sesuai
             return redirect()->intended(route('dashboard'));
         }
     }

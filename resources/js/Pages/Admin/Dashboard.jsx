@@ -1,9 +1,9 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, usePage } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import React, { useEffect } from 'react';
 
 export default function Dashboard() {
-    const { users = [], roles = [] } = usePage().props;
+    const { users = [], roles = [], pendingDonationRequests = [] } = usePage().props;
     const { csrf_token } = usePage().props;
 
     return (
@@ -13,11 +13,63 @@ export default function Dashboard() {
             <Head title="Admin Dashboard" />
 
             <div className="py-12">
-                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">
+                <div className="mx-auto max-w-7xl sm:px-6 lg:px-8 space-y-12">
+                    
+                    {/* Donation Requests Pending Approval */}
+                    <div className="overflow-hidden bg-white shadow-lg sm:rounded-lg p-6">
+                        <h3 className="text-2xl font-bold mb-6 text-gray-700">Pending Donation Requests</h3>
+
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
+                                <thead className="bg-gray-100">
+                                    <tr>
+                                        <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Title</th>
+                                        <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Category</th>
+                                        <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Description</th>
+                                        <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {pendingDonationRequests.length > 0 ? (
+                                        pendingDonationRequests.map(request => (
+                                            <tr key={request.id} className="hover:bg-gray-50 transition duration-150 ease-in-out">
+                                                <td className="px-6 py-4 border-b">{request.title}</td>
+                                                <td className="px-6 py-4 border-b">{request.category}</td>
+                                                <td className="px-6 py-4 border-b">{request.description.substring(0, 50)}...</td>
+                                                <td className="px-6 py-4 border-b flex space-x-4">
+                                                    <Link
+                                                        href={route('admin.donation-requests.approve', request.id)}
+                                                        method="put"
+                                                        as="button"
+                                                        className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                                                    >
+                                                        Approve
+                                                    </Link>
+                                                    <Link
+                                                        href={route('admin.donation-requests.reject', request.id)}
+                                                        method="put"
+                                                        as="button"
+                                                        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+                                                    >
+                                                        Reject
+                                                    </Link>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="4" className="px-6 py-4 text-center text-gray-500">No pending donation requests.</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {/* Existing User Role Management Table */}
                     <div className="overflow-hidden bg-white shadow-lg sm:rounded-lg p-6">
                         <h3 className="text-2xl font-bold mb-6 text-gray-700">Manage User Roles</h3>
 
-                        {/* Users Table */}
                         <div className="overflow-x-auto">
                             <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
                                 <thead className="bg-gray-100">
@@ -45,7 +97,7 @@ export default function Dashboard() {
                                             {/* Assign Role Form */}
                                             <td className="px-6 py-4 border-b">
                                                 <form method="POST" action={route('admin.assign-role')} className="flex items-center space-x-2">
-                                                    <input type="hidden" name="_token" value={csrf_token} /> {/* CSRF token */}
+                                                    <input type="hidden" name="_token" value={csrf_token} />
                                                     <input type="hidden" name="user_id" value={user.id} />
 
                                                     <select
@@ -53,9 +105,7 @@ export default function Dashboard() {
                                                         className="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition duration-150 ease-in-out text-gray-700 bg-gray-50 hover:bg-white cursor-pointer"
                                                         defaultValue=""
                                                     >
-                                                        <option value="" disabled className="text-gray-400">
-                                                            Pilih Role
-                                                        </option>
+                                                        <option value="" disabled>Pilih Role</option>
                                                         {roles.map(role => (
                                                             <option key={role.name} value={role.name}>
                                                                 {role.display_name}
@@ -65,7 +115,7 @@ export default function Dashboard() {
 
                                                     <button
                                                         type="submit"
-                                                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50 transition duration-150 ease-in-out"
+                                                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-150 ease-in-out"
                                                     >
                                                         Assign
                                                     </button>
@@ -75,7 +125,7 @@ export default function Dashboard() {
                                             {/* Unassign Role Form */}
                                             <td className="px-6 py-4 border-b">
                                                 <form method="POST" action={route('admin.unassign-role')} className="flex items-center space-x-2">
-                                                    <input type="hidden" name="_token" value={csrf_token} /> {/* CSRF token */}
+                                                    <input type="hidden" name="_token" value={csrf_token} />
                                                     <input type="hidden" name="user_id" value={user.id} />
 
                                                     <select
@@ -83,9 +133,7 @@ export default function Dashboard() {
                                                         className="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-red-400 focus:border-red-400 transition duration-150 ease-in-out text-gray-700 bg-gray-50 hover:bg-white cursor-pointer"
                                                         defaultValue=""
                                                     >
-                                                        <option value="" disabled className="text-gray-400">
-                                                            Pilih Role untuk dihapus
-                                                        </option>
+                                                        <option value="" disabled>Pilih Role untuk dihapus</option>
                                                         {user.roles.map(role => (
                                                             <option key={role.name} value={role.name}>
                                                                 {role.display_name}
@@ -95,7 +143,7 @@ export default function Dashboard() {
 
                                                     <button
                                                         type="submit"
-                                                        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-50 transition duration-150 ease-in-out"
+                                                        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-150 ease-in-out"
                                                     >
                                                         Unassign
                                                     </button>

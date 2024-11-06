@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Role;
+use App\Models\Donation;
+use App\Models\DonationRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Redirect;
@@ -15,13 +17,21 @@ class AdminController extends Controller
 {
     public function index()
     {
+        // Mengambil semua pengguna dengan peran mereka
         $users = User::with('roles')->get();
+        
+        // Mengambil semua peran yang tersedia
         $roles = Role::all();
+        
+        // Mengambil permintaan donasi dengan status 'pending'
+        $pendingDonationRequests = DonationRequest::where('status', 'pending')->get();
 
+        // Mengirim data ke halaman admin dashboard
         return Inertia::render('Admin/Dashboard', [
             'users' => $users,
             'roles' => $roles,
             'csrf_token' => csrf_token(),
+            'pendingDonationRequests' => $pendingDonationRequests, // Menambahkan data pendingDonationRequests
         ]);
     }
 
