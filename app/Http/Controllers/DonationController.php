@@ -10,28 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class DonationController extends Controller
-{
-
-    /**
-     * Display the details of a donation request with all related donations.
-     * Menampilkan detail dari permintaan donasi bersama dengan daftar donatur.
-     *
-     * @param int $donationRequestId
-     * @return \Inertia\Response
-     */
-    public function myDonations()
-    {
-        $userId = Auth::id();
-        $donations = Donation::where('user_id', $userId)
-            ->with('donationRequest')
-            ->orderBy('created_at', 'desc')
-            ->get();
-    
-        return Inertia::render('UserDashboard', [
-            'donations' => $donations,
-        ]);
-    }    
-    
+{   
     /**
      * Display a listing of donations for the authenticated user.
      *
@@ -62,6 +41,24 @@ class DonationController extends Controller
 
         return Inertia::render('Donations/DonationRequestsList', [
             'donations' => $donations,
+        ]);
+    }
+
+    // Show the edit form for a specific donation
+    public function edit(Donation $donation)
+    {
+        return Inertia::render('Donations/EditDonationPage', [
+            'donation' => $donation,
+        ]);
+    }
+
+    public function show(Donation $donation)
+    {
+        $donationRequest = $donation->donationRequest; // Load related donation request data
+
+        return Inertia::render('Donations/DonationDetailPage', [
+            'donationRequest' => $donationRequest,
+            'donation' => $donation,
         ]);
     }
 
@@ -169,5 +166,47 @@ class DonationController extends Controller
         $donation->delete();
 
         return redirect()->route('dashboard')->with('success', 'Donasi berhasil dihapus.');
+    }
+
+    public function update(Request $request, Donation $donation)
+    {
+        // Define validation rules based on the type of donation
+        $rules = [
+            'type' => 'required|in:uang,barang',
+        ];
+
+        if ($request->type === 'uang') {
+            $rules['amount'] = 'required|numeric|min:1';
+        } else {
+            $rules['item_description'] = 'required|string|max:255';
+            $rules['item_image'] = 'nullable|image|mimes:jpg,jpeg,png|max:2048';
+        }
+
+        // Validate the request data
+        $validatedData = $request->validate($rules);
+
+        // Update donation data based on the validated input
+        $donation->type = $validatedData['type'];
+        if ($validatedData['type'] === 'uang') {
+            $donation->amount = $validatedData['amount'];
+        } else {
+            $donation->item_description = $validatedData['item_description'];
+
+            // Handle image upload if there's a new image
+            if ($request->hasFile('item_image')) {
+                // Delete old image if it exists
+                if ($donation->item_image && Storage::disk('public')->exists($donation->item_image)) {
+                    Storage::disk('public')->delete($donation->item_image);
+                }
+                $donation->item_image = $request->file('item_image')->store('donation_images', 'public');
+            }
+        }
+
+        // Save the updated donation
+        $donation->save();
+
+        // Redirect back with a success message
+        return redirect()->route('donations.show', $donation->id)
+            ->with('success', 'Donasi berhasil diperbarui.');
     }
 }

@@ -16,6 +16,8 @@ Route::get('projects/{project}', [ProjectController::class, 'show'])->name('proj
 Route::get('donation-requests', [DonationRequestController::class, 'index'])->name('donation-requests.index');
 Route::get('/donation-requests/{donation_request}', [DonationRequestController::class, 'show'])->name('donation-requests.show');
 
+Route::get('/donation-requests/{donation_request}/donors', [DonationRequestController::class, 'showDonors'])->name('donation-requests.donors');
+
 // Welcome Page Route
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -28,10 +30,9 @@ Route::get('/', function () {
 
 // Authenticated User Dashboard Routes (requires auth and email verification)
 Route::middleware(['auth', 'verified'])->group(function () {
+    // Main User Dashboard Route (loads both projects and donations)
     Route::get('/dashboard', [ProjectController::class, 'userDashboard'])->name('dashboard');
 
-    Route::get('/UserDashboard', [DonationController::class, 'myDonations'])->name('donations.myDonations');
-    
     // User Donation Routes
     Route::prefix('donations')->name('donations.')->group(function () {
         Route::get('/{donationRequestId}/DonationFormPage', [DonationController::class, 'create'])->name('create'); // Display form to create donation

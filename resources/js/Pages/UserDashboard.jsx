@@ -4,34 +4,51 @@ import { useState } from 'react';
 import { route } from 'ziggy-js';
 
 export default function Dashboard() {
-    const { projects = [], donations = [] } = usePage().props;
+    const { projects = [], donations = [], donationRequest } = usePage().props;
     const [loadingProjectId, setLoadingProjectId] = useState(null);
-    const [statusFilter, setStatusFilter] = useState('all'); // Filter for donation status
+    const [statusFilter, setStatusFilter] = useState('all');
 
-    const handleUnfollowProject = (projectId) => {
-        if (confirm('Apakah Anda yakin ingin membatalkan keikutsertaan Anda dalam proyek ini?')) {
-            setLoadingProjectId(projectId);
-            router.post(route('projects.unfollow', projectId), {
-                onSuccess: () => setLoadingProjectId(null),
-                onError: () => {
-                    setLoadingProjectId(null);
-                    alert('Terjadi kesalahan saat membatalkan keikutsertaan.');
-                },
-            });
+    const handleDeleteDonation = async (donationId) => {
+        if (confirm('Apakah Anda yakin ingin menghapus donasi ini?')) {
+            try {
+                await router.delete(route('donations.destroy', donationId), {
+                    onSuccess: () => alert('Donasi berhasil dihapus.'),
+                    onError: () => alert('Terjadi kesalahan saat menghapus donasi.')
+                });
+            } catch (error) {
+                console.error('Delete error:', error);
+            }
         }
     };
 
-    // Filter donations based on selected status
+    const handleUnfollowProject = async (projectId) => {
+        if (confirm('Apakah Anda yakin ingin membatalkan keikutsertaan Anda dalam proyek ini?')) {
+            setLoadingProjectId(projectId);
+            try {
+                await router.post(route('projects.unfollow', projectId));
+            } catch (error) {
+                alert('Terjadi kesalahan saat membatalkan keikutsertaan.');
+            } finally {
+                setLoadingProjectId(null);
+            }
+        }
+    };
+
     const filteredDonations = donations.filter((donation) => 
         statusFilter === 'all' || donation.status === statusFilter
     );
-    console.log("Received donations:", donations);
+
+    const formatCurrency = (amount) => new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR'
+    }).format(amount);
+
+    console.log("Donations data:", donations);
+
 
     return (
         <AuthenticatedLayout
-            header={
-                <h2 className="text-2xl font-semibold leading-tight text-gray-800">Dashboard</h2>
-            }
+            header={<h2 className="text-2xl font-semibold leading-tight text-gray-800">Dashboard</h2>}
         >
             <Head title="Dashboard" />
 
@@ -55,9 +72,7 @@ export default function Dashboard() {
                                                 <p className="text-gray-600 mb-2">{project.deskripsiProyek}</p>
                                                 <span
                                                     className={`inline-block px-2 py-1 rounded text-sm ${
-                                                        project.statusProyek
-                                                            ? 'bg-green-200 text-green-800'
-                                                            : 'bg-red-200 text-red-800'
+                                                        project.statusProyek ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800'
                                                     }`}
                                                 >
                                                     Status: {project.statusProyek ? 'Aktif' : 'Tidak Aktif'}
@@ -87,19 +102,17 @@ export default function Dashboard() {
 
                         {/* Donation Status Filter */}
                         <div className="flex items-center justify-between mb-4">
-                            <div>
-                                <label className="mr-2 text-gray-600 font-semibold">Filter Status:</label>
-                                <select 
-                                    value={statusFilter} 
-                                    onChange={(e) => setStatusFilter(e.target.value)}
-                                    className="border border-gray-300 rounded-lg p-2"
-                                >
-                                    <option value="all">Semua</option>
-                                    <option value="pending">Menunggu</option>
-                                    <option value="approved">Disetujui</option>
-                                    <option value="rejected">Ditolak</option>
-                                </select>
-                            </div>
+                            <label className="mr-2 text-gray-600 font-semibold">Filter Status:</label>
+                            <select 
+                                value={statusFilter} 
+                                onChange={(e) => setStatusFilter(e.target.value)}
+                                className="border border-gray-300 rounded-lg p-2"
+                            >
+                                <option value="all">Semua</option>
+                                <option value="pending">Menunggu</option>
+                                <option value="approved">Disetujui</option>
+                                <option value="rejected">Ditolak</option>
+                            </select>
                         </div>
 
                         {/* Donation List */}
@@ -120,14 +133,12 @@ export default function Dashboard() {
                                             <tr key={donation.id} className="hover:bg-gray-50 transition duration-150 ease-in-out">
                                                 <td className="px-6 py-4 border-b">
                                                     <Link href={route('donation-requests.show', donation.donation_request_id)} className="text-blue-600 hover:underline">
-                                                        {donation.donationRequest.title}
+                                                        {donation.donationRequest && donation.donationRequest.title ? donation.donationRequest.title : 'Tidak Tersedia'}
                                                     </Link>
                                                 </td>
                                                 <td className="px-6 py-4 border-b">{donation.type === 'uang' ? 'Uang' : 'Barang'}</td>
                                                 <td className="px-6 py-4 border-b">
-                                                    {donation.type === 'uang' 
-                                                        ? `Rp ${donation.amount}` 
-                                                        : donation.item_description}
+                                                    {donation.type === 'uang' ? formatCurrency(donation.amount) : donation.item_description}
                                                 </td>
                                                 <td className="px-6 py-4 border-b">
                                                     <span className={`px-2 py-1 text-xs font-semibold rounded-lg ${
@@ -138,13 +149,28 @@ export default function Dashboard() {
                                                         {donation.status.charAt(0).toUpperCase() + donation.status.slice(1)}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 border-b">
+                                                <td className="px-6 py-4 border-b space-x-2">
+                                                     {/* Edit Button */}
+                                                    <Link
+                                                        href={route('donations.edit', donation.id)}
+                                                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-150 ease-in-out"
+                                                    >
+                                                        Edit
+                                                    </Link>
+
+                                                    {/* Show Detail Button */}
                                                     <Link
                                                         href={route('donations.show', donation.id)}
                                                         className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition duration-150 ease-in-out"
                                                     >
                                                         Lihat Detail
                                                     </Link>
+                                                    <button
+                                                        onClick={() => handleDeleteDonation(donation.id)}
+                                                        className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-150 ease-in-out"
+                                                    >
+                                                        Hapus
+                                                    </button>
                                                 </td>
                                             </tr>
                                         ))

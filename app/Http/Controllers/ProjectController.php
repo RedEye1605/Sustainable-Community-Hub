@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Models\User;
 use App\Models\Volunteer;
+use App\Models\Donation;
+use App\Models\DonationRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
@@ -30,16 +32,23 @@ class ProjectController extends Controller
     public function userDashboard()
     {
         $user = Auth::user();
-        
-        // Ambil proyek yang diikuti user dengan relasi dari tabel Volunteer
+
+        // Get projects the user has joined (using the `volunteers` relationship)
         $joinedProjects = Project::whereHas('volunteers', function ($query) use ($user) {
             $query->where('user_id', $user->id);
         })->with('user')->get();
-    
+
+        // Get donations made by the user
+        $donations = Donation::where('user_id', $user->id)
+            ->with('donationRequest') // Load related donation request data
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         return Inertia::render('UserDashboard', [
             'projects' => $joinedProjects,
+            'donations' => $donations,
         ]);
-    }      
+    }    
 
     /**
      * Display a listing of the resource (akses publik).

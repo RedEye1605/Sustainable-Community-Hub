@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class DonationRequestController extends Controller
 {
@@ -23,6 +24,35 @@ class DonationRequestController extends Controller
 
         return Inertia::render('Admin/DonationRequestsList', [
             'donationRequests' => $donationRequests,
+        ]);
+    }
+
+    // DonationRequestController.phpndefined type 'Log'.
+    public function showDonors($donationRequestId)
+    {
+        // Ambil `donationRequest` beserta `donations.user`
+        $donationRequest = DonationRequest::with(['donations.user'])->findOrFail($donationRequestId);
+
+        // Log untuk memastikan data `donations` diambil dengan benar
+        Log::info('Donation Request:', [$donationRequest]);
+        Log::info('Donations:', $donationRequest->donations->toArray());
+
+        // Kumpulkan data donatur unik
+        $donors = $donationRequest->donations->map(function ($donation) {
+            return [
+                'id' => $donation->user->id,
+                'name' => $donation->user->name,
+                'donation_type' => $donation->type,
+                'amount' => $donation->type === 'uang' ? $donation->amount : 1,
+            ];
+        })->unique('id')->values();
+
+        // Log untuk memastikan data `donors`
+        Log::info('Donors:', $donors->toArray());
+
+        return Inertia::render('Donations/DonationDetailPage', [
+            'donationRequest' => $donationRequest,
+            'donors' => $donors,
         ]);
     }
 
