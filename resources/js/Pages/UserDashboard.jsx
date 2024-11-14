@@ -150,27 +150,19 @@ export default function Dashboard() {
                                                     </span>
                                                 </td>
                                                 <td className="px-6 py-4 border-b space-x-2">
-                                                     {/* Edit Button */}
-                                                    <Link
-                                                        href={route('donations.edit', donation.id)}
-                                                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-150 ease-in-out"
-                                                    >
-                                                        Edit
-                                                    </Link>
-
                                                     {/* Show Detail Button */}
                                                     <Link
-                                                        href={route('donations.show', donation.id)}
+                                                        href={route('donation-requests.show', donation.donation_request_id)}
                                                         className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition duration-150 ease-in-out"
                                                     >
                                                         Lihat Detail
                                                     </Link>
-                                                    <button
+                                                    {/* <button
                                                         onClick={() => handleDeleteDonation(donation.id)}
                                                         className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-150 ease-in-out"
                                                     >
                                                         Hapus
-                                                    </button>
+                                                    </button> */}
                                                 </td>
                                             </tr>
                                         ))

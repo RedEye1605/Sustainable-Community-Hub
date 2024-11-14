@@ -16,8 +16,6 @@ Route::get('projects/{project}', [ProjectController::class, 'show'])->name('proj
 Route::get('donation-requests', [DonationRequestController::class, 'index'])->name('donation-requests.index');
 Route::get('/donation-requests/{donation_request}', [DonationRequestController::class, 'show'])->name('donation-requests.show');
 
-Route::get('/donation-requests/{donation_request}/donors', [DonationRequestController::class, 'showDonors'])->name('donation-requests.donors');
-
 // Welcome Page Route
 Route::get('/', function () {
     return Inertia::render('Welcome', [

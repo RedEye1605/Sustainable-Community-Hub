@@ -6,7 +6,7 @@ import { route } from 'ziggy-js';
 export default function DashboardDonationReceiverPage() {
     const { donationRequests: initialRequests } = usePage().props;
     const [donationRequests, setDonationRequests] = useState(initialRequests);
-    const [statusFilter, setStatusFilter] = useState('all'); // State to filter by status
+    const [statusFilter, setStatusFilter] = useState('all');
 
     const handleDelete = (id) => {
         if (!confirm('Yakin ingin menghapus permintaan ini?')) return;
@@ -84,9 +84,9 @@ export default function DashboardDonationReceiverPage() {
                                                 <td className="px-6 py-4 border-b">{request.title}</td>
                                                 <td className="px-6 py-4 border-b">
                                                     {request.type === 'uang' ? (
-                                                        <p>Rp {request.collected_amount} / Rp {request.target_amount}</p>
+                                                        <p>Rp {Number(request.collected_amount).toLocaleString('id-ID', { minimumFractionDigits: 3 })} / Rp {Number(request.target_amount).toLocaleString('id-ID', { minimumFractionDigits: 3 })}</p>
                                                     ) : (
-                                                        <p>{request.collected_amount} Barang / {request.target_items} Barang</p>
+                                                        <p>{Math.round(request.collected_amount)} Barang / {Math.round(request.target_items)} Barang</p>
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4 border-b">

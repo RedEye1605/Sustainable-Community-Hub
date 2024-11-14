@@ -14,7 +14,18 @@ export default function DonationFormPage({ donationRequest }) {
     });
 
     const [preview, setPreview] = useState(null);
-    const [collectedAmount, setCollectedAmount] = useState(donationRequest.collected_amount || 0); // Start from current collected_amount
+    const [collectedAmount, setCollectedAmount] = useState(donationRequest.collected_amount || 0);
+
+    // Function to format currency with `.000` appended
+    const formatCurrency = (amount) => {
+        const integerAmount = Math.floor(amount); // Ensure integer
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(integerAmount) + '.000'; // Append .000 to the formatted number
+    };
 
     // Calculate donation progress percentage
     const donationProgress = Math.min((collectedAmount / targetAmount) * 100, 100).toFixed(2);
@@ -51,7 +62,7 @@ export default function DonationFormPage({ donationRequest }) {
         }
 
         try {
-            await post(route('donations.store', donationRequest.id), {
+            post(route('donations.store', donationRequest.id), {
                 data: formData,
                 onSuccess: () => {
                     alert('Donasi berhasil dikirim!');
@@ -103,7 +114,7 @@ export default function DonationFormPage({ donationRequest }) {
                 ></div>
             </div>
             <p className="text-gray-700 dark:text-gray-300 mb-6">
-                Total Terkumpul: {isMoneyDonation ? `Rp ${collectedAmount}` : `${collectedAmount} Barang`} dari {isMoneyDonation ? `Rp ${targetAmount}` : `${targetAmount} Barang`} ({donationProgress}%)
+                Total Terkumpul: {isMoneyDonation ? `${formatCurrency(collectedAmount)}` : `${collectedAmount} Barang`} dari {isMoneyDonation ? `${formatCurrency(targetAmount)}` : `${targetAmount} Barang`} ({donationProgress}%)
             </p>
 
             <form onSubmit={handleSubmit} className="max-w-3xl w-full bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg space-y-6">
@@ -124,6 +135,9 @@ export default function DonationFormPage({ donationRequest }) {
                             required
                         />
                         {errors.amount && <p className="text-red-500 text-sm mt-1">{errors.amount}</p>}
+                        <p className="text-gray-700 dark:text-gray-300 mt-2">
+                            Jumlah Donasi: {data.amount ? formatCurrency(data.amount) : '0.000'}
+                        </p>
                     </div>
                 ) : (
                     <>

@@ -3,7 +3,16 @@ import { Head, Link, usePage, router } from '@inertiajs/react';
 import React from 'react';
 
 export default function ProjectManagerDashboard() {
-    const { projects = [] } = usePage().props;
+    const { projects = [], participants = [] } = usePage().props;
+
+    const calculateProgress = (project) => {
+        const projectParticipants = participants.filter(p => p.project_id === project.id).length;
+        return Math.min((projectParticipants / project.required_participants * 100), 100);
+    };
+
+    const getParticipantCount = (project) => {
+        return participants.filter(p => p.project_id === project.id).length;
+    };
 
     const handleDelete = (projectId) => {
         if (confirm('Apakah Anda yakin ingin menghapus proyek ini?')) {
@@ -42,24 +51,36 @@ export default function ProjectManagerDashboard() {
                                     <tr>
                                         <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Project Name</th>
                                         <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Status</th>
+                                        <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Participants</th>
+                                        <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Target</th>
+                                        <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Progress</th>
                                         <th className="px-6 py-3 border-b-2 font-semibold text-left text-gray-600 uppercase tracking-wider">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {projects.map(project => (
-                                        <tr key={project.id} className="hover:bg-gray-50 transition duration-150 ease-in-out">
+                                    {projects.map((project) => (
+                                        <tr key={project.id}>
                                             <td className="px-6 py-4 border-b">{project.namaProyek}</td>
-                                            <td className="px-6 py-4 border-b">{project.statusProyek}</td>
+                                            <td className="px-6 py-4 border-b">{project.statusProyek ? 'Active' : 'Inactive'}</td>
+                                            <td className="px-6 py-4 border-b">
+                                                {getParticipantCount(project)} / {project.required_participants}
+                                            </td>
+                                            <td className="px-6 py-4 border-b">{project.required_participants} orang</td>
+                                            <td className="px-6 py-4 border-b">
+                                                <div className="w-full bg-gray-200 rounded-full h-2.5">
+                                                    <div 
+                                                        className="bg-blue-600 h-2.5 rounded-full"
+                                                        style={{ width: `${calculateProgress(project)}%` }}
+                                                    ></div>
+                                                </div>
+                                            </td>
                                             <td className="px-6 py-4 border-b flex space-x-3">
-                                                {/* Edit Button */}
                                                 <Link
                                                     href={route('projects.edit', project.id)}
                                                     className="px-5 py-2.5 bg-yellow-500 text-white font-semibold rounded-md shadow-md hover:bg-yellow-600 transition duration-200 ease-in-out"
                                                 >
                                                     Edit
                                                 </Link>
-
-                                                {/* Delete Button */}
                                                 <button
                                                     onClick={() => handleDelete(project.id)}
                                                     className="px-5 py-2.5 bg-red-500 text-white font-semibold rounded-md shadow-md hover:bg-red-600 transition duration-200 ease-in-out"

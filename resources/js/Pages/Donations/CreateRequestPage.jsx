@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link, useForm } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 
@@ -6,11 +6,19 @@ export default function CreateRequestPage() {
     const { data, setData, post, processing, errors, reset } = useForm({
         title: '',
         description: '',
-        category: '',      // Menentukan kategori (misal: Baju, Celana, dll.)
-        type: 'uang',      // Menentukan tipe donasi: uang atau barang
-        target_amount: '', // Target jumlah uang (jika type = uang)
-        target_items: '',  // Target jumlah barang (jika type = barang)
+        category: '',
+        type: 'uang',
+        target_amount: '',
+        target_items: '',
     });
+
+    useEffect(() => {
+        if (data.type === 'uang') {
+            setData('category', 'uang');
+        } else if (data.type === 'barang' && data.category === 'uang') {
+            setData('category', '');
+        }
+    }, [data.type]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -25,9 +33,18 @@ export default function CreateRequestPage() {
         });
     };
 
+    const formatCurrency = (amount) => {
+        const integerAmount = Math.floor(amount);
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(integerAmount) + '.000';
+    };
+
     return (
         <div className="w-full min-h-screen p-6 lg:p-12 bg-gradient-to-r from-blue-200 to-indigo-300 dark:from-gray-800 dark:to-gray-900 flex flex-col items-center">
-            {/* Breadcrumbs */}
             <nav className="mb-6 text-sm text-gray-500 dark:text-gray-400 w-full max-w-3xl">
                 <Link href="/" className="hover:underline">Home</Link>
                 <span className="mx-2">/</span>
@@ -38,7 +55,6 @@ export default function CreateRequestPage() {
                 Ajukan Tempat Pengumpulan Donasi
             </h1>
 
-            {/* Form Pengajuan */}
             <form onSubmit={handleSubmit} className="max-w-3xl w-full bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg space-y-6">
                 <div>
                     <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Judul Pengumpulan</label>
@@ -47,7 +63,7 @@ export default function CreateRequestPage() {
                         name="title"
                         value={data.title}
                         onChange={(e) => setData('title', e.target.value)}
-                        placeholder="Contoh: Pengumpulan Baju Bekas"
+                        placeholder={data.type === 'uang' ? 'Sumbangan untuk anak yatim' : 'Contoh: Pengumpulan Baju Bekas'}
                         className="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 text-gray-900 dark:text-gray-200 bg-gray-50 dark:bg-gray-700"
                         required
                     />
@@ -67,7 +83,6 @@ export default function CreateRequestPage() {
                     {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
                 </div>
 
-                {/* Field Tipe Donasi */}
                 <div>
                     <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Tipe Donasi</label>
                     <select
@@ -83,28 +98,31 @@ export default function CreateRequestPage() {
                     {errors.type && <p className="text-red-500 text-sm mt-1">{errors.type}</p>}
                 </div>
 
-                {/* Field Kategori */}
-                <div>
-                    <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Kategori</label>
-                    <input
-                        type="text"
-                        name="category"
-                        value={data.category}
-                        onChange={(e) => setData('category', e.target.value)}
-                        placeholder="Contoh: Baju, Celana, dll."
-                        className="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 text-gray-900 dark:text-gray-200 bg-gray-50 dark:bg-gray-700"
-                        required
-                    />
-                    {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
-                </div>
+                {data.type !== 'uang' && (
+                    <div>
+                        <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Kategori</label>
+                        <input
+                            type="text"
+                            name="category"
+                            value={data.category}
+                            onChange={(e) => setData('category', e.target.value)}
+                            placeholder="Contoh: Baju, Celana, dll."
+                            className="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-3 text-gray-900 dark:text-gray-200 bg-gray-50 dark:bg-gray-700"
+                            required
+                        />
+                        {errors.category && <p className="text-red-500 text-sm mt-1">{errors.category}</p>}
+                    </div>
+                )}
 
-                {/* Conditional Fields Based on Type */}
                 {data.type === 'uang' ? (
                     <div>
-                        <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Target Pengumpulan (Rp)</label>
+                        <label htmlFor="target_amount" className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                            Target Pengumpulan (Rp)
+                        </label>
                         <input
                             type="number"
                             name="target_amount"
+                            id="target_amount"
                             value={data.target_amount}
                             onChange={(e) => setData('target_amount', e.target.value)}
                             placeholder="Masukkan jumlah target uang"
@@ -113,13 +131,17 @@ export default function CreateRequestPage() {
                             required
                         />
                         {errors.target_amount && <p className="text-red-500 text-sm mt-1">{errors.target_amount}</p>}
+                        <p className="text-gray-700 dark:text-gray-300 mt-2">
+                            Target Pengumpulan: {data.target_amount ? formatCurrency(data.target_amount) : '0.000'}
+                        </p>
                     </div>
                 ) : (
                     <div>
-                        <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Target Jumlah Barang</label>
+                        <label htmlFor="target_items" className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Target Jumlah Barang</label>
                         <input
                             type="number"
                             name="target_items"
+                            id="target_items"
                             value={data.target_items}
                             onChange={(e) => setData('target_items', e.target.value)}
                             placeholder="Masukkan jumlah barang yang diperlukan"
@@ -131,7 +153,6 @@ export default function CreateRequestPage() {
                     </div>
                 )}
 
-                {/* Tombol Submit */}
                 <div className="flex justify-center mt-8">
                     <button
                         type="submit"

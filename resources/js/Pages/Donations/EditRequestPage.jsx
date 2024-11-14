@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm, Link } from '@inertiajs/react';
 import { route } from 'ziggy-js';
 
@@ -6,22 +6,27 @@ export default function EditRequestPage({ donationRequest }) {
     const form = useForm({
         title: donationRequest.title || '',
         description: donationRequest.description || '',
-        category: donationRequest.category || '', // Category (e.g., "Baju" for type "barang")
-        type: donationRequest.type || 'uang',     // Type: "uang" or "barang"
+        category: donationRequest.category || '',
+        type: donationRequest.type || 'uang',
         target_amount: donationRequest.target_amount || '',
         target_items: donationRequest.target_items || '',
     });
+
+    useEffect(() => {
+        if (form.data.type === 'uang') {
+            form.setData('category', 'uang');
+        } else if (form.data.type === 'barang' && form.data.category === 'uang') {
+            form.setData('category', '');
+        }
+    }, [form.data.type]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
         const submissionData = {
             ...form.data,
-            // Only send category if type is "barang"
             category: form.data.type === 'barang' ? form.data.category : '',
-            // Only send target_amount if type is "uang"
             target_amount: form.data.type === 'uang' ? form.data.target_amount : '',
-            // Only send target_items if type is "barang"
             target_items: form.data.type === 'barang' ? form.data.target_items : '',
         };
 
@@ -36,9 +41,18 @@ export default function EditRequestPage({ donationRequest }) {
         });
     };
 
+    const formatCurrency = (amount) => {
+        const integerAmount = Math.floor(amount);
+        return new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(integerAmount) + '.000';
+    };
+
     return (
         <div className="w-full min-h-screen p-6 lg:p-12 bg-gradient-to-r from-blue-200 to-indigo-300 dark:from-gray-800 dark:to-gray-900 flex flex-col items-center">
-            {/* Breadcrumbs */}
             <nav className="mb-6 text-sm text-gray-500 dark:text-gray-400 w-full max-w-3xl">
                 <Link href="/" className="hover:underline">Home</Link>
                 <span className="mx-2">/</span>
@@ -79,7 +93,6 @@ export default function EditRequestPage({ donationRequest }) {
                     {form.errors.description && <p className="text-red-500 text-sm mt-1">{form.errors.description}</p>}
                 </div>
 
-                {/* Field Tipe Donasi */}
                 <div>
                     <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Tipe Donasi</label>
                     <select
@@ -95,7 +108,6 @@ export default function EditRequestPage({ donationRequest }) {
                     {form.errors.type && <p className="text-red-500 text-sm mt-1">{form.errors.type}</p>}
                 </div>
 
-                {/* Field Kategori (conditional for type "barang") */}
                 {form.data.type === 'barang' && (
                     <div>
                         <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Kategori</label>
@@ -111,7 +123,6 @@ export default function EditRequestPage({ donationRequest }) {
                     </div>
                 )}
 
-                {/* Conditional Fields Based on Type */}
                 {form.data.type === 'uang' ? (
                     <div>
                         <label className="block text-lg font-semibold text-gray-700 dark:text-gray-300 mb-2">Target Pengumpulan (Rp)</label>
@@ -125,6 +136,9 @@ export default function EditRequestPage({ donationRequest }) {
                             min="0"
                         />
                         {form.errors.target_amount && <p className="text-red-500 text-sm mt-1">{form.errors.target_amount}</p>}
+                        <p className="text-gray-700 dark:text-gray-300 mt-2">
+                            Target Pengumpulan: {form.data.target_amount ? formatCurrency(form.data.target_amount) : '0.000'}
+                        </p>
                     </div>
                 ) : (
                     <div>
@@ -142,7 +156,6 @@ export default function EditRequestPage({ donationRequest }) {
                     </div>
                 )}
 
-                {/* Submit Button */}
                 <div className="flex justify-center mt-8">
                     <button
                         type="submit"

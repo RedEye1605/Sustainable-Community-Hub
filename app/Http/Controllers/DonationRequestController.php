@@ -27,35 +27,6 @@ class DonationRequestController extends Controller
         ]);
     }
 
-    // DonationRequestController.phpndefined type 'Log'.
-    public function showDonors($donationRequestId)
-    {
-        // Ambil `donationRequest` beserta `donations.user`
-        $donationRequest = DonationRequest::with(['donations.user'])->findOrFail($donationRequestId);
-
-        // Log untuk memastikan data `donations` diambil dengan benar
-        Log::info('Donation Request:', [$donationRequest]);
-        Log::info('Donations:', $donationRequest->donations->toArray());
-
-        // Kumpulkan data donatur unik
-        $donors = $donationRequest->donations->map(function ($donation) {
-            return [
-                'id' => $donation->user->id,
-                'name' => $donation->user->name,
-                'donation_type' => $donation->type,
-                'amount' => $donation->type === 'uang' ? $donation->amount : 1,
-            ];
-        })->unique('id')->values();
-
-        // Log untuk memastikan data `donors`
-        Log::info('Donors:', $donors->toArray());
-
-        return Inertia::render('Donations/DonationDetailPage', [
-            'donationRequest' => $donationRequest,
-            'donors' => $donors,
-        ]);
-    }
-
     /**
      * Display a listing of all approved donation requests.
      *
@@ -177,8 +148,28 @@ class DonationRequestController extends Controller
      */
     public function show(DonationRequest $donationRequest)
     {
+        $donationRequest->load('donations.user');
+
+        // Mengelompokkan donasi berdasarkan user_id dan menghitung total donasi per pengguna
+        $donors = $donationRequest->donations
+            ->groupBy('user_id')
+            ->map(function ($donationsByUser) {
+                $user = $donationsByUser->first()->user;
+                $totalAmount = $donationsByUser->where('type', 'uang')->sum('amount');
+                $totalItems = $donationsByUser->where('type', '!=', 'uang')->count();
+
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'donation_type' => $donationsByUser->first()->type,
+                    'amount' => $totalAmount > 0 ? $totalAmount : $totalItems,
+                ];
+            })
+            ->values();
+
         return Inertia::render('Donations/DonationDetailPage', [
             'donationRequest' => $donationRequest,
+            'donors' => $donors,
         ]);
     }
 
@@ -191,15 +182,20 @@ class DonationRequestController extends Controller
      */
     public function update(Request $request, DonationRequest $donationRequest)
     {
-        $validated = $request->validate([
+        $validatedData = $request->validate([
             'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            'description' => 'required|string',
             'category' => 'required|string',
+            'type' => 'required|string|in:uang,barang',
+            'target_amount' => 'nullable|numeric|min:1|required_if:type,uang',
+            'target_items' => 'nullable|numeric|min:1|required_if:type,barang',
         ]);
 
-        $donationRequest->update($validated);
+        $donationRequest->update($validatedData);
 
-        return redirect()->route('donation-receiver.dashboard')->with('message', 'Permintaan donasi berhasil diperbarui!');
+        return redirect()
+            ->route('donation-receiver.dashboard')
+            ->with('success', 'Permintaan donasi berhasil diperbarui.');
     }
 
     /**

@@ -29,4 +29,23 @@ class DonationRequest extends Model
     {
         return $this->hasMany(Donation::class);
     }
+    
+    public function formatDonorData()
+    {
+        return $this->donations
+            ->groupBy('user_id')
+            ->map(function ($donationsByUser) {
+                $user = $donationsByUser->first()->user;
+                $totalAmount = $donationsByUser->where('type', 'uang')->sum('amount');
+                $totalItems = $donationsByUser->where('type', '!=', 'uang')->count();
+
+                return [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'donation_type' => $donationsByUser->first()->type,
+                    'amount' => $totalAmount > 0 ? $totalAmount : $totalItems,
+                ];
+            })
+            ->values();
+    }
 }

@@ -19,13 +19,16 @@ class ProjectController extends Controller
 
     public function dashboard()
     {
-        // Ambil proyek yang dikelola oleh user saat ini (dengan role 'pengelola')
         $user = Auth::user();
-
-        $projects = $user->projects; // Mengambil proyek milik pengguna yang sedang login
+        $projects = $user->projects;
+        
+        // Get participants (volunteers) for each project
+        $participants = Volunteer::whereIn('project_id', $projects->pluck('id'))
+            ->get();
 
         return Inertia::render('project-manager/Dashboard', [
             'projects' => $projects,
+            'participants' => $participants
         ]);
     }
 
@@ -33,22 +36,41 @@ class ProjectController extends Controller
     {
         $user = Auth::user();
 
-        // Get projects the user has joined (using the `volunteers` relationship)
+        // Get projects the user has joined
         $joinedProjects = Project::whereHas('volunteers', function ($query) use ($user) {
             $query->where('user_id', $user->id);
         })->with('user')->get();
 
-        // Get donations made by the user
+        // Get donations made by the user with donation request data
         $donations = Donation::where('user_id', $user->id)
-            ->with('donationRequest') // Load related donation request data
+            ->with(['donationRequest' => function ($query) {
+                $query->with('donations.user'); // Load nested relation
+            }])
             ->orderBy('created_at', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($donation) {
+                // Format donation data similar to DonationRequestController@show
+                return [
+                    'id' => $donation->id,
+                    'donation_request_id' => $donation->donation_request_id,
+                    'type' => $donation->type,
+                    'amount' => $donation->amount,
+                    'item_description' => $donation->item_description,
+                    'status' => $donation->status,
+                    'donationRequest' => [
+                        'title' => $donation->donationRequest->title,
+                        'collected_amount' => $donation->donationRequest->donations
+                            ->where('type', 'uang')
+                            ->sum('amount'),
+                    ],
+                ];
+            });
 
         return Inertia::render('UserDashboard', [
             'projects' => $joinedProjects,
             'donations' => $donations,
         ]);
-    }    
+    }  
 
     /**
      * Display a listing of the resource (akses publik).
