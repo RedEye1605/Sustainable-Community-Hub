@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, Link, usePage } from '@inertiajs/react';
 import Modal from '../Components/Modal';
 import ConfirmPassword from './Auth/ConfirmPassword';
@@ -12,6 +12,7 @@ import DonationBanner from '../Components/DonationBanner';
 import SectionSeparator from '@/Components/SectionSeperator';
 import Testimonial from '@/Components/Testimonial';
 import { Transition } from '@headlessui/react';
+import useIntersectionObserver from '@/Hooks/useIntersectionObserver';
 import '../../css/app.css';
 
 // Reusable components
@@ -55,6 +56,8 @@ const Card = ({ href, imageSrc, imageAlt, title, description, children }) => (
     </a>
 );
 
+const commonButtonStyle = "inline-block px-6 py-2 bg-[#FF2D20] text-white text-sm font-medium rounded-lg transform transition-all duration-300 hover:bg-[#e0241c] hover:-translate-y-1 hover:shadow-lg";
+
 export default function Welcome({ auth, laravelVersion, phpVersion }) {   
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [isRegisterOpen, setIsRegisterOpen] = useState(false);
@@ -62,7 +65,9 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
     const [isConfirmPasswordOpen, setIsConfirmPasswordOpen] = useState(false);
     const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false);
     const [isVerifyEmailOpen, setIsVerifyEmailOpen] = useState(false);
-    const [isMenuOpen, setIsMenuOpen] = useState(false)
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    useIntersectionObserver();
 
     // Fungsi untuk membuka modal Forgot Password dari Login
     const openForgotPasswordModal = () => {
@@ -299,24 +304,26 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     </Modal>
 
                     {/* Hero Section */}
-                    <HeroCarousel slides={slides} searchPlaceholder="Cari inisiatif hijau di dekat Anda" />
+                    <HeroCarousel slides={slides} searchPlaceholder="Cari inisiatif hijau di dekat Anda" className="scroll-animate fade-in"/>
 
-                    <SectionSeparator text="Aksi Nyata untuk Masa Depan yang Lebih Hijau" />
+                    <SectionSeparator text="Aksi Nyata untuk Masa Depan yang Lebih Hijau" className="scroll-animate fade-in" />
 
                     {/* Impact Section */}
-                    <section className="impact-section py-16 text-center bg-gray-50 dark:bg-gray-900">
+                    <section className="impact-section py-16 text-center bg-gray-50 dark:bg-gray-900 scroll-animate fade-in-up">
                         <h2 className="text-4xl font-extrabold mb-8 text-gray-800 dark:text-white">
                             Dampak Positif yang Telah Kita Ciptakan
                         </h2>
                         <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
-                            {/* Individual impact cards with hover effect */}
                             {[
                                 { count: "10,000+", label: "Pohon Ditanam" },
                                 { count: "500+", label: "Kilogram Sampah Dikumpulkan" },
                                 { count: "300+", label: "Relawan Terlibat" },
                                 { count: "20+", label: "Kegiatan Dijalankan" },
                             ].map((impact, index) => (
-                                <div key={index} className="hover:scale-105 transition-transform duration-300">
+                                <div 
+                                    key={index} 
+                                    className={`scroll-animate fade-in-up delay-${index * 100} hover:scale-105 transition-transform duration-300`}
+                                >
                                     <h3 className="text-3xl font-semibold text-green-600 dark:text-green-300">{impact.count}</h3>
                                     <p className="text-lg text-gray-700 dark:text-gray-400">{impact.label}</p>
                                 </div>
@@ -324,18 +331,21 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                         </div>
                     </section>
 
-                    <SectionSeparator />
+                    <SectionSeparator className="scroll-animate fade-in" />
 
                     {/* Testimonials Section */}
-                    <Testimonial />
+                    <div className="scroll-animate fade-in-up">
+                        <Testimonial />
+                    </div>
 
-                    <SectionSeparator />
+                    <SectionSeparator className="scroll-animate fade-in"/>
 
                     {/* How to Help Section */}
-                    <section className="how-to-help py-16 text-center bg-gray-50 dark:bg-gray-900">
-                        <h2 className="text-4xl font-extrabold mb-8 text-gray-800 dark:text-white">Bagaimana Anda Bisa Membantu</h2>
+                    <section className="how-to-help py-16 text-center bg-gray-50 dark:bg-gray-900 scroll-animate fade-in-up">
+                        <h2 className="text-4xl font-extrabold mb-8 text-gray-800 dark:text-white">
+                            Bagaimana Anda Bisa Membantu
+                        </h2>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-                            {/* Help options with animated hover effect */}
                             {[
                                 { title: "Donasi", description: "Dukung proyek kami dengan berdonasi untuk keberlanjutan lingkungan." },
                                 { title: "Jadi Relawan", description: "Bergabung dengan komunitas untuk aksi nyata di lapangan." },
@@ -343,7 +353,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                             ].map((help, index) => (
                                 <div
                                     key={index}
-                                    className="p-6 bg-white dark:bg-gray-800 shadow-lg rounded-lg transform transition hover:scale-105 hover:shadow-xl duration-300"
+                                    className={`scroll-animate fade-in-up delay-${index * 100} p-6 bg-white dark:bg-gray-800 shadow-lg rounded-lg transform transition hover:scale-105 hover:shadow-xl duration-300`}
                                 >
                                     <h3 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2">{help.title}</h3>
                                     <p className="text-gray-600 dark:text-gray-400">{help.description}</p>
@@ -353,77 +363,95 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     </section>
 
                     {/* Donation Banner */}
-                    <DonationBanner />
+                    <DonationBanner className="scroll-animate fade-in"/>
 
                     {/* Information Cards Section */}
                     <section className="information-cards grid grid-cols-1 gap-8 py-12 px-6 lg:grid-cols-2">
-                        <Card
-                            href="#"
-                            imageSrc="map.jpg"
-                            imageAlt="Green Initiative Map"
-                            title="Peta Lokasi Inisiatif Hijau"
-                            description="Temukan lokasi inisiatif hijau di daerah Anda."
-                        >
-                            <button className="px-4 py-2 bg-[#FF2D20] text-white rounded-lg hover:bg-[#e0241c]">Lihat Detail</button>
-                        </Card>
-                        <Card
-                            href="#"
-                            imageSrc="calendar.jpg"
-                            imageAlt="Event Calendar"
-                            title="Kalender Kegiatan"
-                            description="Jadwal kegiatan komunitas untuk lingkungan berkelanjutan."
-                        >
-                            <button className="px-4 py-2 bg-[#FF2D20] text-white rounded-lg hover:bg-[#e0241c]">Lihat Detail</button>
-                        </Card>
+                        {[
+                            {
+                                href: "#",
+                                imageSrc: "map.jpg",
+                                imageAlt: "Green Initiative Map",
+                                title: "Peta Lokasi Inisiatif Hijau",
+                                description: "Temukan lokasi inisiatif hijau di daerah Anda.",
+                            },
+                            {
+                                href: "#",
+                                imageSrc: "calendar.jpg",
+                                imageAlt: "Event Calendar",
+                                title: "Kalender Kegiatan",
+                                description: "Jadwal kegiatan komunitas untuk lingkungan berkelanjutan.",
+                            }
+                        ].map((card, index) => (
+                            <div key={index} className={`scroll-animate fade-in-up delay-${index * 100}`}>
+                                <Card {...card}>
+                                    <button className={commonButtonStyle}>
+                                        Lihat Detail
+                                    </button>
+                                </Card>
+                            </div>
+                        ))}
                     </section>
 
                     {/* Upcoming Events Section */}
-                    <section className="upcoming-events py-12 px-6">
-                        <SectionHeader title="Event Terdekat" />
+                    <section className="upcoming-events py-12 px-6 scroll-animate fade-in-up">
+                        <SectionHeader title="Event Terdekat" className="scroll-animate fade-in" />
                         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                            <Card
-                                href="#"
-                                imageSrc="beach-cleanup.jpg"
-                                imageAlt="Beach Cleanup"
-                                title="Bersih Bersih Pantai Balekambang"
-                                description="01 Januari 2025"
-                            >
-                                <button className="px-4 py-2 bg-[#FF2D20] text-white rounded-lg hover:bg-[#e0241c]">Lihat Detail</button>
-                            </Card>
-                            <Card
-                                href="#"
-                                imageSrc="beach-cleanup.jpg"
-                                imageAlt="Beach Cleanup"
-                                title="Bersih Bersih Pantai Balekambang"
-                                description="01 Januari 2025"
-                            >
-                                <button className="px-4 py-2 bg-[#FF2D20] text-white rounded-lg hover:bg-[#e0241c]">Lihat Detail</button>
-                            </Card>
+                            {[
+                                {
+                                    href: "#",
+                                    imageSrc: "beach-cleanup.jpg",
+                                    imageAlt: "Beach Cleanup",
+                                    title: "Bersih Bersih Pantai Balekambang",
+                                    description: "01 Januari 2025"
+                                },
+                                {
+                                    href: "#",
+                                    imageSrc: "beach-cleanup.jpg",
+                                    imageAlt: "Beach Cleanup", 
+                                    title: "Bersih Bersih Pantai Balekambang",
+                                    description: "01 Januari 2025"
+                                }
+                            ].map((event, index) => (
+                                <div key={index} className={`scroll-animate fade-in-up delay-${index * 100}`}>
+                                    <Card {...event}>
+                                        <button className={commonButtonStyle}>
+                                            Lihat Detail
+                                        </button>
+                                    </Card>
+                                </div>
+                            ))}
                         </div>
                     </section>
 
                     {/* News and Articles Section */}
-                    <section className="news-articles py-12 px-6">
-                        <SectionHeader title="Berita dan Artikel" />
+                    <section className="news-articles py-12 px-6 scroll-animate fade-in-up">
+                        <SectionHeader title="Berita dan Artikel" className="scroll-animate fade-in" />
                         <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                            <Card
-                                href="#"
-                                imageSrc="teen-volunteers.jpg"
-                                imageAlt="Teen Volunteers"
-                                title="Sekelompok Remaja Bantu Atasi Kelaparan Suku di Papua"
-                                description="Baca kisah inspiratif ini"
-                            >
-                                <button className="px-4 py-2 bg-[#FF2D20] text-white rounded-lg hover:bg-[#e0241c]">Baca</button>
-                            </Card>
-                            <Card
-                                href="#"
-                                imageSrc="teen-volunteers.jpg"
-                                imageAlt="Teen Volunteers"
-                                title="Sekelompok Remaja Bantu Atasi Kelaparan Suku di Papua"
-                                description="Baca kisah inspiratif ini"
-                            >
-                                <button className="px-4 py-2 bg-[#FF2D20] text-white rounded-lg hover:bg-[#e0241c]">Baca</button>
-                            </Card>
+                            {[
+                                {
+                                    href: "#",
+                                    imageSrc: "teen-volunteers.jpg",
+                                    imageAlt: "Teen Volunteers",
+                                    title: "Sekelompok Remaja Bantu Atasi Kelaparan Suku di Papua",
+                                    description: "Baca kisah inspiratif ini"
+                                },
+                                {
+                                    href: "#",
+                                    imageSrc: "teen-volunteers.jpg",
+                                    imageAlt: "Teen Volunteers",
+                                    title: "Sekelompok Remaja Bantu Atasi Kelaparan Suku di Papua",
+                                    description: "Baca kisah inspiratif ini"
+                                }
+                            ].map((article, index) => (
+                                <div key={index} className={`scroll-animate fade-in-up delay-${index * 100}`}>
+                                    <Card {...article}>
+                                        <button className={commonButtonStyle}>
+                                            Baca
+                                        </button>
+                                    </Card>
+                                </div>
+                            ))}
                         </div>
                     </section>
                 </main>

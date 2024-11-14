@@ -9,6 +9,7 @@ import Register from './Auth/Register';
 import ResetPassword from './Auth/ResetPassword';
 import VerifyEmail from './Auth/VerifyEmail';
 import { Transition } from '@headlessui/react';
+import { motion } from 'framer-motion';
 import '../../css/app.css';
 
 // Reusable components
@@ -38,29 +39,37 @@ const truncateText = (text, charLimit) => {
 const Card = ({ href, imageSrc, imageAlt, title, description, children }) => (
     <a
         href={href}
-        className="flex flex-col items-start gap-4 overflow-hidden rounded-lg bg-white dark:bg-gray-800 p-6 shadow-lg ring-1 ring-gray-200 dark:ring-gray-700 transition duration-300 hover:shadow-2xl hover:ring-gray-400 dark:hover:ring-gray-500 transform hover:scale-105"
+        className="block h-[440px] bg-white dark:bg-gray-800 rounded-xl shadow-md 
+                 overflow-hidden transform transition-all duration-300 
+                 hover:shadow-xl hover:scale-[1.02]"
     >
-        <div className="relative w-full flex items-stretch">
+        <div className="relative w-full h-48">
             <img
-                src={imageSrc}
+                src={imageSrc || '/default-project.jpg'} 
                 alt={imageAlt}
-                className="aspect-video w-full rounded-md object-cover shadow-md"
-                onError={(e) => (e.currentTarget.style.display = 'none')}
+                className="w-full h-full object-cover"
             />
         </div>
-        <div className="relative flex flex-col gap-4">
-            <SectionHeader title={title} />
-            <p className="text-sm text-gray-700 dark:text-gray-300">
-                {truncateText(description, 100)} {/* Limit to 100 characters */}
+        
+        <div className="p-5 flex flex-col h-[calc(440px-192px)]"> {/* 440px total - 192px (h-48) image */}
+            <h3 className="text-xl font-semibold text-gray-800 dark:text-white mb-2 
+                         line-clamp-2 flex-none">
+                {title}
+            </h3>
+            
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4 flex-grow
+                       line-clamp-3">
+                {truncateText(description, 150)}
             </p>
-            <div className="mt-4">
+            
+            <div className="mt-auto flex-none">
                 {children}
             </div>
         </div>
     </a>
 );
 
-const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
+const ProjectList = ({ auth, laravelVersion, phpVersion, isLoading}) => {
     const { projects, flash } = usePage().props;
     const successMessage = flash && flash.success ? flash.success : null;
 
@@ -72,6 +81,52 @@ const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
     const [isResetPasswordOpen, setIsResetPasswordOpen] = useState(false);
     const [isVerifyEmailOpen, setIsVerifyEmailOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+    // Animation variants
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    const cardVariants = {
+        hidden: { opacity: 0, y: 20 },
+        show: { 
+            opacity: 1, 
+            y: 0,
+            transition: {
+                duration: 0.3
+            }
+        }
+    };
+
+    // Loading skeleton
+    const LoadingSkeleton = () => (
+        <div className="animate-pulse grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+            {[...Array(8)].map((_, index) => (
+                <div key={index} className="bg-gray-200 dark:bg-gray-700 rounded-lg h-[300px]"></div>
+            ))}
+        </div>
+    );
+
+    // Empty state
+    const EmptyState = () => (
+        <div className="flex flex-col items-center justify-center py-12 px-4 bg-white dark:bg-gray-800 rounded-lg shadow-lg transform hover:scale-[1.02] transition-all duration-300">
+            <svg className="w-20 h-20 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Tidak ada proyek
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 text-center">
+                Belum ada proyek yang tersedia saat ini.
+            </p>
+        </div>
+    );
 
     // Fungsi untuk membuka modal Forgot Password dari Login
     const openForgotPasswordModal = () => {
@@ -327,33 +382,63 @@ const ProjectList = ({ auth, laravelVersion, phpVersion }) => {
                     
                     {/* Project List Section */}
                     <section className="py-12 px-6 max-w-7xl mx-auto">
-                        <SectionHeader title="Daftar Proyek" />
-                        <div>
-                        <AddProject />
+                        <div className="mb-8">
+                            <SectionHeader 
+                                title="Daftar Proyek"
+                                className="text-4xl font-bold text-gray-800 dark:text-white mb-2 
+                                        relative inline-block after:content-[''] after:absolute 
+                                        after:w-1/2 after:h-1 after:bg-[#FF2D20] after:left-0 
+                                        after:-bottom-2"
+                            />
                         </div>
-                        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                            {projects && projects.length > 0 ? (
-                                projects.map((project) => (
-                                    <Card
-                                        key={project.id}
-                                        href={route('projects.show', project.id)}
-                                        imageSrc={project.imageUrl}
-                                        imageAlt={`Gambar dari proyek ${project.namaProyek}`}
-                                        title={project.namaProyek}
-                                        description={`${project.deskripsiProyek}`}
-                                    >
-                                        <button className="px-4 py-2 bg-[#FF2D20] text-white rounded-lg hover:bg-[#e0241c]">Lihat Detail</button>
-                                    </Card>
-                                ))
-                            ) : (
-                                <div className="text-center py-6 text-gray-600">Tidak ada proyek yang ditemukan.</div>
-                            )}
+                        
+                        <div className="mb-8">
+                            <AddProject />
                         </div>
+
+                        {isLoading ? (
+                            <LoadingSkeleton />
+                        ) : (
+                            <motion.div 
+                                className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 auto-rows-fr"
+                                variants={containerVariants}
+                                initial="hidden"
+                                animate="show"
+                            >
+                                {projects && projects.length > 0 ? (
+                                    projects.map((project) => (
+                                        <motion.div 
+                                            key={project.id}
+                                            variants={cardVariants}
+                                            className="h-full"
+                                        >
+                                            <Card
+                                                href={route('projects.show', project.id)}
+                                                imageSrc={project.imageUrl}
+                                                imageAlt={`Gambar dari proyek ${project.namaProyek}`}
+                                                title={project.namaProyek}
+                                                description={project.deskripsiProyek}
+                                            >
+                                                <button className="w-full px-4 py-2 bg-[#FF2D20] text-white rounded-lg
+                                                            hover:bg-[#e0241c] transform transition-all duration-300
+                                                            hover:-translate-y-1 hover:shadow-lg">
+                                                    Lihat Detail
+                                                </button>
+                                            </Card>
+                                        </motion.div>
+                                    ))
+                                ) : (
+                                    <div className="col-span-full">
+                                        <EmptyState />
+                                    </div>
+                                )}
+                            </motion.div>
+                        )}
                     </section>
                 </main>
 
                 <footer className="footer py-12 px-6 bg-gray-800 text-gray-300 flex flex-col md:flex-row justify-between items-center space-y-8 md:space-y-0">
-                    <div className="footer-info text-center md:text-left">
+                    <div className="footer-info text-center md:text-left">z
                         <h2 className="text-2xl font-bold text-white">Sustainable Community</h2>
                         <p className="mt-2 text-sm">Komunitas Perubahan Sejak 2024</p>
                         <p className="mt-4 text-xs text-gray-400">© 2024 Sustainable Community Hub. All rights reserved.</p>

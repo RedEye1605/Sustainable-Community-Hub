@@ -234,26 +234,53 @@ const DonationRequestList = () => {
 
                     <div className="w-full max-w-4xl">
                         {donationRequests.length > 0 ? (
-                            <ul className="space-y-6">
-                                {donationRequests.map((request) => (
-                                    <li key={request.id} className="flex items-start gap-4 p-4 bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition-shadow duration-200">
-                                        <div className="flex-shrink-0 w-16 h-16 bg-blue-100 dark:bg-blue-700 text-blue-800 dark:text-blue-200 rounded-full flex items-center justify-center font-bold text-lg">
+                            <ul className="space-y-6 animate-fade-in">
+                                {donationRequests.map((request, index) => (
+                                    <li 
+                                        key={request.id} 
+                                        className="flex items-start gap-4 p-6 bg-white dark:bg-gray-800 rounded-lg 
+                                                shadow-md hover:shadow-xl transform hover:-translate-y-1 
+                                                transition-all duration-300 ease-in-out
+                                                animate-slide-up"
+                                        style={{
+                                            animationDelay: `${index * 100}ms`
+                                        }}
+                                    >
+                                        <div className="flex-shrink-0 w-16 h-16 bg-blue-100 dark:bg-blue-700 
+                                                    text-blue-800 dark:text-blue-200 rounded-full 
+                                                    flex items-center justify-center font-bold text-lg
+                                                    transform hover:rotate-12 transition-transform duration-300">
                                             {request.title[0]}
                                         </div>
-                                        <div className="flex-grow">
-                                        <Link href={route('donation-requests.show', { donation_request: request.id })} className="text-2xl font-bold text-gray-800 dark:text-white hover:text-[#FF2D20]">
-                                            {request.title}
-                                        </Link>
-                                            <p className="text-gray-600 dark:text-gray-400 mt-2">
+                                        <div className="flex-grow group">
+                                            <Link 
+                                                href={route('donation-requests.show', { donation_request: request.id })} 
+                                                className="text-2xl font-bold text-gray-800 dark:text-white
+                                                        relative inline-block
+                                                        after:content-[''] after:absolute after:w-0 after:h-0.5
+                                                        after:bg-[#FF2D20] after:left-0 after:-bottom-1
+                                                        after:transition-all after:duration-300
+                                                        group-hover:after:w-full"
+                                            >
+                                                {request.title}
+                                            </Link>
+                                            <p className="text-gray-600 dark:text-gray-400 mt-2 
+                                                        transform transition-all duration-300
+                                                        group-hover:text-gray-900 dark:group-hover:text-gray-200">
                                                 {truncateText(request.description, 100)}
                                             </p>
-                                            <div className="mt-4 flex space-x-4">
-                                                {/* Display only 'type' if type is 'uang', otherwise display both 'type' and 'category' */}
-                                                <span className="px-2 py-1 text-sm font-semibold bg-green-100 dark:bg-green-700 rounded text-green-800 dark:text-green-200">
+                                            <div className="mt-4 flex flex-wrap gap-2">
+                                                <span className="px-3 py-1 text-sm font-semibold 
+                                                            bg-green-100 dark:bg-green-700 rounded-full 
+                                                            text-green-800 dark:text-green-200
+                                                            transform hover:scale-105 transition-transform duration-200">
                                                     Tipe: {request.type === 'uang' ? 'Uang' : 'Barang'}
                                                 </span>
                                                 {request.type === 'barang' && (
-                                                    <span className="px-2 py-1 text-sm font-semibold bg-yellow-100 dark:bg-yellow-700 rounded text-yellow-800 dark:text-yellow-200">
+                                                    <span className="px-3 py-1 text-sm font-semibold 
+                                                                bg-yellow-100 dark:bg-yellow-700 rounded-full 
+                                                                text-yellow-800 dark:text-yellow-200
+                                                                transform hover:scale-105 transition-transform duration-200">
                                                         Kategori: {request.category}
                                                     </span>
                                                 )}
@@ -263,11 +290,43 @@ const DonationRequestList = () => {
                                 ))}
                             </ul>
                         ) : (
-                            <p className="text-center text-gray-600 dark:text-gray-400 mt-8">Belum ada pengajuan donasi yang tersedia.</p>
+                            <div className="text-center p-12 bg-white dark:bg-gray-800 rounded-lg shadow-md
+                                            transform hover:scale-[1.01] transition-transform duration-300">
+                                <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+                                </svg>
+                                <p className="text-gray-600 dark:text-gray-400">Belum ada pengajuan donasi yang tersedia.</p>
+                            </div>
                         )}
                     </div>
 
-                    {/* Login Modal */}
+                    <style jsx>{`
+                        @keyframes fade-in {
+                            from { opacity: 0; }
+                            to { opacity: 1; }
+                        }
+
+                        @keyframes slide-up {
+                            from { 
+                                opacity: 0;
+                                transform: translateY(20px);
+                            }
+                            to { 
+                                opacity: 1;
+                                transform: translateY(0);
+                            }
+                        }
+
+                        .animate-fade-in {
+                            animation: fade-in 0.5s ease-out forwards;
+                        }
+
+                        .animate-slide-up {
+                            opacity: 0;
+                            animation: slide-up 0.5s ease-out forwards;
+                        }
+                    `}</style>
+
                     <Modal show={isLoginOpen} onClose={() => setIsLoginOpen(false)} maxWidth="md">
                         <div className="p-4">
                             <Login 
