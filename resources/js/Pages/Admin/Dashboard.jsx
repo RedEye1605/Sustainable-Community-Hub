@@ -3,13 +3,21 @@ import { Head, Link, usePage, router } from '@inertiajs/react';
 import React from 'react';
 
 export default function Dashboard() {
-    const { users = [], roles = [], pendingDonationRequests = [] } = usePage().props;
-    const { csrf_token } = usePage().props;
+    const { users = [], roles = [], pendingDonationRequests = [], roleRequests = [], csrf_token } = usePage().props;
 
     const handleAction = (routeName, id, message) => {
         if (confirm(message)) {
             router.put(route(routeName, id), {}, {
                 onSuccess: () => alert(`Request ${message.toLowerCase()} successfully!`)
+            });
+        }
+    };
+
+    const handleRequest = (id, action) => {
+        if (confirm(`Apakah Anda yakin ingin ${action} permintaan ini?`)) {
+            router.post(route('admin.handle-role-request', id), { action }, {
+                onSuccess: () => alert(`Permintaan berhasil ${action}.`),
+                onError: () => alert(`Gagal ${action} permintaan.`),
             });
         }
     };
@@ -108,6 +116,54 @@ export default function Dashboard() {
                                             </td>
                                         </tr>
                                     ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    {/* Role Requests Section */}
+                    <div className="bg-white overflow-hidden shadow-sm sm:rounded-lg mt-6">
+                        <div className="p-6 text-gray-900">
+                            <h2 className="text-lg font-semibold mb-4">Pengajuan Role yang Menunggu Persetujuan</h2>
+                            <table className="min-w-full bg-white">
+                                <thead>
+                                    <tr>
+                                        <th className="px-6 py-3 border-b-2 text-left">User</th>
+                                        <th className="px-6 py-3 border-b-2 text-left">Requested Role</th>
+                                        <th className="px-6 py-3 border-b-2 text-left">Alasan</th>
+                                        <th className="px-6 py-3 border-b-2 text-left">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {roleRequests.length > 0 ? (
+                                        roleRequests.map((request) => (
+                                            <tr key={request.id}>
+                                                <td className="px-6 py-4 border-b">{request.user.name}</td>
+                                                <td className="px-6 py-4 border-b">{request.requested_role}</td>
+                                                <td className="px-6 py-4 border-b">{request.reason}</td>
+                                                <td className="px-6 py-4 border-b">
+                                                    <div className="flex space-x-2">
+                                                        <button
+                                                            onClick={() => handleRequest(request.id, 'approve')}
+                                                            className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                                                        >
+                                                            Approve
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleRequest(request.id, 'reject')}
+                                                            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                                                        >
+                                                            Reject
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan="4" className="px-6 py-4 text-center text-gray-500">Tidak ada pengajuan role.</td>
+                                        </tr>
+                                    )}
                                 </tbody>
                             </table>
                         </div>

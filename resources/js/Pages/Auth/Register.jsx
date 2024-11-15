@@ -11,11 +11,14 @@ export default function Register({ onLoginClick }) {
         email: '',
         password: '',
         password_confirmation: '',
+        requested_role: '',
+        reason: '',
     });
 
     const submit = (e) => {
         e.preventDefault();
         post(route('register'), {
+            data,
             onFinish: () => reset('password', 'password_confirmation'),
         });
     };
@@ -89,6 +92,39 @@ export default function Register({ onLoginClick }) {
                     />
                     <InputError message={errors.password_confirmation} className="mt-2" />
                 </div>
+
+                <div className="mt-4">
+                    <InputLabel htmlFor="requested_role" value="Request Role (Optional)" />
+                    <select
+                        id="requested_role"
+                        name="requested_role"
+                        className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                        value={data.requested_role}
+                        onChange={(e) => setData('requested_role', e.target.value)}
+                    >
+                        <option value="">Select Role</option>
+                        <option value="pengelola proyek">Project Manager</option>
+                        <option value="donatur receiver">Donation Receiver</option>
+                    </select>
+                    <InputError message={errors.requested_role} className="mt-2" />
+                </div>
+
+                {/* Input Reason akan muncul jika role dipilih */}
+                {data.requested_role !== '' && (
+                    <div className="mt-4">
+                        <InputLabel htmlFor="reason" value="Reason for requesting this role" />
+                        <TextInput
+                            id="reason"
+                            type="text"
+                            name="reason"
+                            value={data.reason}
+                            className="mt-1 block w-full"
+                            onChange={(e) => setData('reason', e.target.value)}
+                            required
+                        />
+                        <InputError message={errors.reason} className="mt-2" />
+                    </div>
+                )}
 
                 <div className="mt-4 flex items-center justify-end">
                     {/* Tambahkan log untuk debugging */}

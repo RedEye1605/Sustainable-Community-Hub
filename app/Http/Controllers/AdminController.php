@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Role;
 use App\Models\Donation;
+use App\Models\RoleRequest;
 use App\Models\DonationRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -26,12 +27,17 @@ class AdminController extends Controller
         // Mengambil permintaan donasi dengan status 'pending'
         $pendingDonationRequests = DonationRequest::where('status', 'pending')->get();
 
+        $roleRequests = RoleRequest::with('user')
+                    ->where('status', 'pending')
+                    ->get();
+
         // Mengirim data ke halaman admin dashboard
         return Inertia::render('Admin/Dashboard', [
             'users' => $users,
             'roles' => $roles,
             'csrf_token' => csrf_token(),
-            'pendingDonationRequests' => $pendingDonationRequests, // Menambahkan data pendingDonationRequests
+            'pendingDonationRequests' => $pendingDonationRequests,
+            'roleRequests' => $roleRequests
         ]);
     }
 
@@ -62,5 +68,31 @@ class AdminController extends Controller
         }
 
         return redirect()->route('admin.dashboard')->with('status', 'Role berhasil dihapus');
+    }
+
+    public function handleRoleRequest(Request $request, $id)
+    {
+        $roleRequest = RoleRequest::findOrFail($id);
+
+        if ($request->action === 'approve') {
+            $user = $roleRequest->user;
+            $role = Role::where('name', $roleRequest->requested_role)->first();
+
+            if ($role) {
+                $user->roles()->attach($role->id);
+            }
+
+            $roleRequest->status = 'approved';
+            $roleRequest->save();
+
+            return redirect()->back()->with('message', 'Pengajuan role berhasil disetujui.');
+        } elseif ($request->action === 'reject') {
+            $roleRequest->status = 'rejected';
+            $roleRequest->save();
+
+            return redirect()->back()->with('message', 'Pengajuan role berhasil ditolak.');
+        }
+
+        return redirect()->back()->with('error', 'Aksi tidak valid.');
     }
 }

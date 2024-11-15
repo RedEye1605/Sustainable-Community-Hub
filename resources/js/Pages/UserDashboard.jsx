@@ -1,12 +1,16 @@
+import React, { useState } from 'react';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, usePage, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { Head, Link, useForm, usePage, router} from '@inertiajs/react';
 import { route } from 'ziggy-js';
 
-export default function Dashboard() {
-    const { projects = [], donations = [], donationRequest } = usePage().props;
+export default function Dashboard({ projects, donations, roleRequests }) {
     const [loadingProjectId, setLoadingProjectId] = useState(null);
     const [statusFilter, setStatusFilter] = useState('all');
+    const [showRoleRequestForm, setShowRoleRequestForm] = useState(false);
+    const { data, setData, post, reset, errors } = useForm({
+        requested_role: '',
+        reason: '',
+    });
 
     const handleDeleteDonation = async (donationId) => {
         if (confirm('Apakah Anda yakin ingin menghapus donasi ini?')) {
@@ -26,12 +30,23 @@ export default function Dashboard() {
             setLoadingProjectId(projectId);
             try {
                 await router.post(route('projects.unfollow', projectId));
+                // Handle success
             } catch (error) {
                 alert('Terjadi kesalahan saat membatalkan keikutsertaan.');
             } finally {
                 setLoadingProjectId(null);
             }
         }
+    };
+
+    const handleRoleRequestSubmit = (e) => {
+        e.preventDefault();
+        post(route('role-requests.store'), {
+            onSuccess: () => {
+                reset();
+                setShowRoleRequestForm(false);
+            },
+        });
     };
 
     const filteredDonations = donations.filter((donation) => 
@@ -42,9 +57,6 @@ export default function Dashboard() {
         style: 'currency',
         currency: 'IDR'
     }).format(amount);
-
-    console.log("Donations data:", donations);
-
 
     return (
         <AuthenticatedLayout
@@ -174,6 +186,94 @@ export default function Dashboard() {
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+
+                    {/* Role Request Section */}
+                    <div className="overflow-hidden bg-white shadow-lg sm:rounded-lg p-6">
+                        <h3 className="text-2xl font-bold mb-6 text-gray-800">Status Permintaan Role Anda</h3>
+                        {roleRequests.length > 0 ? (
+                            <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
+                                <thead className="bg-gray-100">
+                                    <tr>
+                                        <th className="px-6 py-3 border-b text-left text-sm font-medium text-gray-500">Role yang Diminta</th>
+                                        <th className="px-6 py-3 border-b text-left text-sm font-medium text-gray-500">Status</th>
+                                        <th className="px-6 py-3 border-b text-left text-sm font-medium text-gray-500">Alasan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {roleRequests.map((request) => (
+                                        <tr key={request.id}>
+                                            <td className="px-6 py-4 border-b">{request.requested_role}</td>
+                                            <td className="px-6 py-4 border-b capitalize">
+                                                <span className={`px-2 py-1 text-xs font-semibold rounded-lg ${
+                                                    request.status === 'approved' ? 'bg-green-100 text-green-800' :
+                                                    request.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                                    'bg-yellow-100 text-yellow-800'
+                                                }`}>
+                                                    {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 border-b">{request.reason}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        ) : (
+                            <p className="mt-4 text-gray-600">Anda belum mengajukan permintaan role.</p>
+                        )}
+
+                        {/* Tombol untuk Memunculkan Form Pengajuan Role */}
+                        <div className="mt-4">
+                            <button
+                                onClick={() => setShowRoleRequestForm(!showRoleRequestForm)}
+                                className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-150 ease-in-out"
+                            >
+                                {showRoleRequestForm ? 'Tutup Form' : 'Ajukan Permintaan Role Baru'}
+                            </button>
+                        </div>
+
+                        {/* Form untuk Permintaan Role Baru */}
+                        {showRoleRequestForm && (
+                            <div className="mt-8">
+                                <h3 className="text-xl font-bold mb-4 text-gray-800">Ajukan Permintaan Role Baru</h3>
+                                <form onSubmit={handleRoleRequestSubmit}>
+                                    <div className="mb-4">
+                                        <label htmlFor="requested_role" className="block text-sm font-medium text-gray-700">Role yang Diminta</label>
+                                        <select
+                                            id="requested_role"
+                                            name="requested_role"
+                                            value={data.requested_role}
+                                            onChange={(e) => setData('requested_role', e.target.value)}
+                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                        >
+                                            <option value="">Pilih Role</option>
+                                            <option value="pengelola proyek">Pengelola Proyek</option>
+                                            <option value="donatur receiver">Donatur Receiver</option>
+                                        </select>
+                                        {errors.requested_role && <p className="mt-2 text-sm text-red-600">{errors.requested_role}</p>}
+                                    </div>
+                                    <div className="mb-4">
+                                        <label htmlFor="reason" className="block text-sm font-medium text-gray-700">Alasan</label>
+                                        <textarea
+                                            id="reason"
+                                            name="reason"
+                                            value={data.reason}
+                                            onChange={(e) => setData('reason', e.target.value)}
+                                            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm"
+                                        />
+                                        {errors.reason && <p className="mt-2 text-sm text-red-600">{errors.reason}</p>}
+                                    </div>
+                                    <div className="flex justify-end">
+                                        <button
+                                            type="submit"
+                                            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-150 ease-in-out"
+                                        >
+                                            Ajukan Permintaan
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

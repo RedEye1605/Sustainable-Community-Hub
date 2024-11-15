@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Models\RoleRequest;
 
 class User extends Authenticatable
 {
@@ -63,6 +64,11 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Project::class, 'volunteers')
                     ->withTimestamps();
+    }
+
+    public function roleRequests()
+    {
+        return $this->hasMany(RoleRequest::class);
     }
 
     /**

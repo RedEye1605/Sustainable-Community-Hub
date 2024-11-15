@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Volunteer;
 use App\Models\Donation;
 use App\Models\DonationRequest;
+use App\Models\RoleRequest;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
@@ -31,25 +32,24 @@ class ProjectController extends Controller
             'participants' => $participants
         ]);
     }
-
+    
     public function userDashboard()
     {
         $user = Auth::user();
-
-        // Get projects the user has joined
+    
+        // Dapatkan proyek yang diikuti pengguna
         $joinedProjects = Project::whereHas('volunteers', function ($query) use ($user) {
             $query->where('user_id', $user->id);
         })->with('user')->get();
-
-        // Get donations made by the user with donation request data
+    
+        // Dapatkan donasi yang dilakukan pengguna beserta data permintaan donasi
         $donations = Donation::where('user_id', $user->id)
             ->with(['donationRequest' => function ($query) {
-                $query->with('donations.user'); // Load nested relation
+                $query->with('donations.user');
             }])
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($donation) {
-                // Format donation data similar to DonationRequestController@show
                 return [
                     'id' => $donation->id,
                     'donation_request_id' => $donation->donation_request_id,
@@ -58,19 +58,23 @@ class ProjectController extends Controller
                     'item_description' => $donation->item_description,
                     'status' => $donation->status,
                     'donationRequest' => [
-                        'title' => $donation->donationRequest->title,
+                        'title' => $donation->donationRequest->title ?? 'Tidak Tersedia',
                         'collected_amount' => $donation->donationRequest->donations
                             ->where('type', 'uang')
                             ->sum('amount'),
                     ],
                 ];
             });
-
+    
+        // Dapatkan permintaan role pengguna
+        $roleRequests = RoleRequest::where('user_id', $user->id)->get();
+    
         return Inertia::render('UserDashboard', [
             'projects' => $joinedProjects,
             'donations' => $donations,
+            'roleRequests' => $roleRequests,
         ]);
-    }  
+    }
 
     /**
      * Display a listing of the resource (akses publik).

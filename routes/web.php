@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\VolunteerController;
 use App\Http\Controllers\DonationController;
 use App\Http\Controllers\DonationRequestController;
+use App\Http\Controllers\RoleRequestController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -30,6 +31,7 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     // Main User Dashboard Route (loads both projects and donations)
     Route::get('/dashboard', [ProjectController::class, 'userDashboard'])->name('dashboard');
+    Route::post('/role-requests', [RoleRequestController::class, 'store'])->name('role-requests.store');
 
     // User Donation Routes
     Route::prefix('donations')->name('donations.')->group(function () {
@@ -47,6 +49,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::post('/assign-role', [AdminController::class, 'assignRole'])->name('admin.assign-role');
     Route::post('/unassign-role', [AdminController::class, 'unassignRole'])->name('admin.unassign-role');
+    Route::post('/role-requests/{id}', [AdminController::class, 'handleRoleRequest'])->name('admin.handle-role-request');
     
     // Admin-specific donation request management routes
     Route::get('/donation-requests', [DonationRequestController::class, 'adminIndex'])->name('admin.donation-requests.index');

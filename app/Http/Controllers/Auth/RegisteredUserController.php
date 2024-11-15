@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\RoleRequest;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -34,6 +35,8 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'requested_role' => 'nullable|string|exists:roles,name',
+            'reason' => 'nullable|string',
         ]);
 
         $user = User::create([
@@ -41,6 +44,22 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        if ($request->requested_role) {
+            // Check if a role request already exists
+            $existingRequest = RoleRequest::where('user_id', $user->id)
+                ->where('requested_role', $request->requested_role)
+                ->where('status', 'pending')
+                ->first();
+    
+            if (!$existingRequest) {
+                RoleRequest::create([
+                    'user_id' => $user->id,
+                    'requested_role' => $request->requested_role,
+                    'reason' => $request->reason,
+                ]);
+            }
+        }
 
         event(new Registered($user));
 
