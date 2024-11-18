@@ -370,14 +370,14 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                         {[
                             {
                                 href: "#",
-                                imageSrc: "map.jpg",
+                                imageSrc: "/storage/images/AssetWelcome/Peta.jpg",
                                 imageAlt: "Green Initiative Map",
                                 title: "Peta Lokasi Inisiatif Hijau",
                                 description: "Temukan lokasi inisiatif hijau di daerah Anda.",
                             },
                             {
                                 href: "#",
-                                imageSrc: "calendar.jpg",
+                                imageSrc: "/storage/images/AssetWelcome/Kalender.jpg",
                                 imageAlt: "Event Calendar",
                                 title: "Kalender Kegiatan",
                                 description: "Jadwal kegiatan komunitas untuk lingkungan berkelanjutan.",
