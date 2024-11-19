@@ -310,7 +310,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                     {/* Impact Section */}
                     <section className="impact-section py-16 text-center bg-gray-50 dark:bg-gray-900 scroll-animate fade-in-up">
-                        <h2 className="text-4xl font-extrabold mb-8 text-gray-800 dark:text-white">
+                        <h2 className="text-4xl font-extrabold mb-8 text-gray-800 dark:text-white hover:text-[#FF2D20] transition-all duration-300 transform hover:scale-110">
                             Dampak Positif yang Telah Kita Ciptakan
                         </h2>
                         <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
@@ -322,10 +322,20 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                             ].map((impact, index) => (
                                 <div 
                                     key={index} 
-                                    className={`scroll-animate fade-in-up delay-${index * 100} hover:scale-105 transition-transform duration-300`}
+                                    className={`scroll-animate fade-in-up delay-${index * 100} p-6 rounded-lg 
+                                    hover:bg-white dark:hover:bg-gray-800 
+                                    hover:shadow-xl 
+                                    hover:scale-105 
+                                    hover:-translate-y-2 
+                                    transition-all duration-300 ease-in-out 
+                                    cursor-pointer`}
                                 >
-                                    <h3 className="text-3xl font-semibold text-green-600 dark:text-green-300">{impact.count}</h3>
-                                    <p className="text-lg text-gray-700 dark:text-gray-400">{impact.label}</p>
+                                    <h3 className="text-3xl font-semibold text-green-600 dark:text-green-300 hover:text-[#FF2D20] dark:hover:text-[#FF2D20] transition-all duration-300 transform hover:scale-110">
+                                        {impact.count}
+                                    </h3>
+                                    <p className="text-lg text-gray-700 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 transition-all duration-300 transform hover:scale-110">
+                                        {impact.label}
+                                    </p>
                                 </div>
                             ))}
                         </div>
@@ -342,21 +352,53 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                     {/* How to Help Section */}
                     <section className="how-to-help py-16 text-center bg-gray-50 dark:bg-gray-900 scroll-animate fade-in-up">
-                        <h2 className="text-4xl font-extrabold mb-8 text-gray-800 dark:text-white">
+                        <h2 className="text-4xl font-extrabold mb-8 text-gray-800 dark:text-white hover:text-[#FF2D20] transition-all duration-500 ease-in-out transform hover:scale-105">
                             Bagaimana Anda Bisa Membantu
                         </h2>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
                             {[
-                                { title: "Donasi", description: "Dukung proyek kami dengan berdonasi untuk keberlanjutan lingkungan." },
-                                { title: "Jadi Relawan", description: "Bergabung dengan komunitas untuk aksi nyata di lapangan." },
-                                { title: "Bagikan", description: "Sebarkan informasi tentang misi kami kepada teman-teman Anda." },
+                                { 
+                                    title: "Donasi", 
+                                    description: "Dukung proyek kami dengan berdonasi untuk keberlanjutan lingkungan.",
+                                    icon: "💝"
+                                },
+                                { 
+                                    title: "Jadi Relawan", 
+                                    description: "Bergabung dengan komunitas untuk aksi nyata di lapangan.",
+                                    icon: "🤝"
+                                },
+                                { 
+                                    title: "Bagikan", 
+                                    description: "Sebarkan informasi tentang misi kami kepada teman-teman Anda.",
+                                    icon: "📢"
+                                },
                             ].map((help, index) => (
                                 <div
                                     key={index}
-                                    className={`scroll-animate fade-in-up delay-${index * 100} p-6 bg-white dark:bg-gray-800 shadow-lg rounded-lg transform transition hover:scale-105 hover:shadow-xl duration-300`}
+                                    className={`
+                                        scroll-animate fade-in-up delay-${index * 100} 
+                                        p-6 bg-white dark:bg-gray-800 
+                                        rounded-lg 
+                                        transform transition-all duration-500 ease-in-out
+                                        hover:scale-105 
+                                        hover:shadow-2xl 
+                                        hover:bg-gradient-to-b hover:from-white hover:to-gray-50
+                                        dark:hover:bg-gradient-to-b dark:hover:from-gray-800 dark:hover:to-gray-700
+                                        cursor-pointer
+                                        border border-transparent
+                                        hover:border-[#FF2D20]
+                                        group
+                                    `}
                                 >
-                                    <h3 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2">{help.title}</h3>
-                                    <p className="text-gray-600 dark:text-gray-400">{help.description}</p>
+                                    <div className="text-4xl mb-4 transform transition-all duration-500 group-hover:scale-110">
+                                        {help.icon}
+                                    </div>
+                                    <h3 className="text-2xl font-semibold text-gray-800 dark:text-white mb-2 transition-all duration-500 group-hover:text-[#FF2D20]">
+                                        {help.title}
+                                    </h3>
+                                    <p className="text-gray-600 dark:text-gray-400 transition-all duration-500 group-hover:text-gray-800 dark:group-hover:text-gray-200">
+                                        {help.description}
+                                    </p>
                                 </div>
                             ))}
                         </div>
@@ -366,56 +408,27 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     <DonationBanner className="scroll-animate fade-in"/>
 
                     {/* Information Cards Section */}
-                    <section className="information-cards grid grid-cols-1 gap-8 py-12 px-6 lg:grid-cols-2">
-                        {[
-                            {
-                                href: "#",
-                                imageSrc: "/storage/images/AssetWelcome/Peta.jpg",
-                                imageAlt: "Green Initiative Map",
-                                title: "Peta Lokasi Inisiatif Hijau",
-                                description: "Temukan lokasi inisiatif hijau di daerah Anda.",
-                            },
-                            {
-                                href: "#",
-                                imageSrc: "/storage/images/AssetWelcome/Kalender.jpg",
-                                imageAlt: "Event Calendar",
-                                title: "Kalender Kegiatan",
-                                description: "Jadwal kegiatan komunitas untuk lingkungan berkelanjutan.",
-                            }
-                        ].map((card, index) => (
-                            <div key={index} className={`scroll-animate fade-in-up delay-${index * 100}`}>
-                                <Card {...card}>
-                                    <button className={commonButtonStyle}>
-                                        Lihat Detail
-                                    </button>
-                                </Card>
-                            </div>
-                        ))}
-                    </section>
-
-                    {/* Upcoming Events Section */}
-                    <section className="upcoming-events py-12 px-6 scroll-animate fade-in-up">
-                        <SectionHeader title="Event Terdekat" className="scroll-animate fade-in" />
-                        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+                    <section className="information-cards py-16 px-8 bg-gray-50 dark:bg-gray-900">
+                        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
                             {[
                                 {
                                     href: "#",
-                                    imageSrc: "beach-cleanup.jpg",
-                                    imageAlt: "Beach Cleanup",
-                                    title: "Bersih Bersih Pantai Balekambang",
-                                    description: "01 Januari 2025"
+                                    imageSrc: "/storage/images/AssetWelcome/pexels-jmark-32307.jpg",
+                                    imageAlt: "Green Initiative Map",
+                                    title: "Peta Lokasi Inisiatif Hijau",
+                                    description: "Temukan lokasi inisiatif hijau di daerah Anda.",
                                 },
                                 {
                                     href: "#",
-                                    imageSrc: "beach-cleanup.jpg",
-                                    imageAlt: "Beach Cleanup", 
-                                    title: "Bersih Bersih Pantai Balekambang",
-                                    description: "01 Januari 2025"
+                                    imageSrc: "/storage/images/AssetWelcome/istockphoto-1415587430-1024x1024.jpg",
+                                    imageAlt: "Event Calendar",
+                                    title: "Kalender Kegiatan",
+                                    description: "Jadwal kegiatan komunitas untuk lingkungan berkelanjutan.",
                                 }
-                            ].map((event, index) => (
-                                <div key={index} className={`scroll-animate fade-in-up delay-${index * 100}`}>
-                                    <Card {...event}>
-                                        <button className={commonButtonStyle}>
+                            ].map((card, index) => (
+                                <div key={index} className="scroll-animate fade-in-up">
+                                    <Card {...card}>
+                                        <button className={`${commonButtonStyle} mt-4`}>
                                             Lihat Detail
                                         </button>
                                     </Card>
@@ -424,34 +437,69 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                         </div>
                     </section>
 
+                    {/* Upcoming Events Section */}
+                    <section className="upcoming-events py-16 px-8 bg-white dark:bg-gray-800">
+                        <div className="max-w-7xl mx-auto">
+                            <SectionHeader title="Event Terdekat" />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-8">
+                                {[
+                                    {
+                                        href: "#",
+                                        imageSrc: "/storage/images/AssetWelcome/pexels-ron-lach-9037222.jpg",
+                                        imageAlt: "Beach Cleanup",
+                                        title: "Bersih Pantai Balekambang",
+                                        description: "01 Januari 2025",
+                                    },
+                                    {
+                                        href: "#",
+                                        imageSrc: "/storage/images/AssetWelcome/pexels-tomfisk-2666806.jpg",
+                                        imageAlt: "Mangrove Planting",
+                                        title: "Penanaman Mangrove di Parangtritis",
+                                        description: "01 Januari 2025",
+                                    }
+                                ].map((event, index) => (
+                                    <div key={index} className="scroll-animate fade-in-up">
+                                        <Card {...event}>
+                                            <button className={`${commonButtonStyle} mt-4`}>
+                                                Lihat Detail
+                                            </button>
+                                        </Card>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
+
                     {/* News and Articles Section */}
-                    <section className="news-articles py-12 px-6 scroll-animate fade-in-up">
-                        <SectionHeader title="Berita dan Artikel" className="scroll-animate fade-in" />
-                        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-                            {[
-                                {
-                                    href: "#",
-                                    imageSrc: "teen-volunteers.jpg",
-                                    imageAlt: "Teen Volunteers",
-                                    title: "Sekelompok Remaja Bantu Atasi Kelaparan Suku di Papua",
-                                    description: "Baca kisah inspiratif ini"
-                                },
-                                {
-                                    href: "#",
-                                    imageSrc: "teen-volunteers.jpg",
-                                    imageAlt: "Teen Volunteers",
-                                    title: "Sekelompok Remaja Bantu Atasi Kelaparan Suku di Papua",
-                                    description: "Baca kisah inspiratif ini"
-                                }
-                            ].map((article, index) => (
-                                <div key={index} className={`scroll-animate fade-in-up delay-${index * 100}`}>
-                                    <Card {...article}>
-                                        <button className={commonButtonStyle}>
-                                            Baca
-                                        </button>
-                                    </Card>
-                                </div>
-                            ))}
+                    <section className="news-articles py-16 px-8 bg-gray-50 dark:bg-gray-900">
+                        <div className="max-w-7xl mx-auto">
+                            <SectionHeader title="Berita dan Artikel" />
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mt-8">
+                                {[
+                                    {
+                                        href: "#",
+                                        imageSrc: "/storage/images/AssetWelcome/pexels-cottonbro-6590920.jpg",
+                                        imageAlt: "Teen Volunteers",
+                                        title: "Remaja Bantu Atasi Kelaparan di Papua",
+                                        description: "Baca kisah inspiratif ini",
+                                    },
+                                    {
+                                        href: "#",
+                                        imageSrc: "/storage/images/AssetWelcome/pexels-pixabay-259780.jpg",
+                                        imageAlt: "Helping Children",
+                                        title: "Membantu Anak-Anak di Daerah Terpencil",
+                                        description: "Baca kisah inspiratif ini",
+                                    }
+                                ].map((article, index) => (
+                                    <div key={index} className="scroll-animate fade-in-up">
+                                        <Card {...article}>
+                                            <button className={`${commonButtonStyle} mt-4`}>
+                                                Baca
+                                            </button>
+                                        </Card>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     </section>
                 </main>
